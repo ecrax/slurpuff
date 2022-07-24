@@ -7,7 +7,7 @@ const DynamicInput: React.FC<{
   return (
     <label>
       {name}
-      {state.map((ingredient, i) => (
+      {state.map((field, i) => (
         <div key={i}>
           <input type="text" />
           <button
@@ -20,11 +20,11 @@ const DynamicInput: React.FC<{
           {state.length !== 1 && i === state.length - 1 && (
             <button
               onClick={() => {
-                const _ingredients = [...state];
+                const _state = [...state];
 
-                _ingredients.splice(i, 1);
+                _state.splice(i, 1);
 
-                setState(_ingredients);
+                setState(_state);
               }}
             >
               -

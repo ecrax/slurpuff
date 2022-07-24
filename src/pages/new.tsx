@@ -2,18 +2,55 @@ import DynamicInput from "./../components/DynamicInput";
 import type { NextPage } from "next";
 import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { trpc } from "../utils/trpc";
+import { ImageError } from "next/dist/server/image-optimizer";
+import { toBase64 } from "../utils/base64";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
 
-  const { isLoading, error, mutate } = trpc.useMutation(["recipe.create"]);
+  const {
+    isLoading: createIsLoading,
+    error: createError,
+    mutate: createRecipe,
+  } = trpc.useMutation(["recipe.create"]);
+
+  const {
+    isLoading: uploadIsLoading,
+    error: uploadError,
+    mutate: uploadImage,
+  } = trpc.useMutation(["image.upload"]);
 
   const [ingredients, setIngredients] = useState([""]);
   const [steps, setSteps] = useState([""]);
   const [tags, setTags] = useState([""]);
   const [name, setName] = useState("");
+  const [image, setImage] = useState<File>();
+
+  const handleCreate = async () => {
+    console.log(name);
+    console.log("ingredients?", ingredients);
+    console.log("steps?", steps);
+    console.log("tags?", tags);
+
+    if (!session?.user?.id) return;
+    if (!image) return;
+
+    const baseConvertImage = await toBase64(image);
+
+    uploadImage({ image: baseConvertImage });
+
+    /* createRecipe({
+      authorId: session?.user?.id,
+      name: name,
+      ingredients: ingredients,
+      steps: steps,
+      tags: tags,
+      image: "",
+      timeRequired: 34,
+    }); */
+  };
 
   if (status === "loading") {
     return <p>Loading</p>;
@@ -47,11 +84,6 @@ const New: NextPage = () => {
                   className="flex flex-col"
                   onSubmit={(e) => {
                     e.preventDefault();
-
-                    console.log(name);
-                    console.log("ingredients?", ingredients);
-                    console.log("steps?", steps);
-                    console.log("tags?", tags);
                   }}
                 >
                   <label>
@@ -61,6 +93,15 @@ const New: NextPage = () => {
                       onChange={(e) => setName(e.target.value)}
                     />
                   </label>
+                  <input
+                    onChange={(e) => {
+                      //not nice but i dont know ts
+                      setImage(e.target.files![0]);
+                    }}
+                    accept=".jpg, .png, .jpeg"
+                    className="mb-2 fileInput"
+                    type="file"
+                  ></input>
                   <DynamicInput
                     setState={setIngredients}
                     state={ingredients}
@@ -72,7 +113,10 @@ const New: NextPage = () => {
                     name={"Steps"}
                   />
                   <DynamicInput setState={setTags} state={tags} name={"Tags"} />
-                  <button>Create</button>
+                  <button disabled={createIsLoading} onClick={handleCreate}>
+                    Create
+                  </button>
+                  <p>{createError ? createError.message : ""}</p>
                 </form>
               </main>
             </>
