@@ -31,7 +31,7 @@ export const imageRouter = createRouter()
         input.image,
         { folder: "slurpuff" },
         function (error, result) {
-          console.log(result, error);
+          //console.log(result, error);
         }
       );
 

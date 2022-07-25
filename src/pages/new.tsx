@@ -5,6 +5,7 @@ import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
 import { toBase64 } from "../utils/base64";
+import { toMiliseconds } from "../utils/time";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -26,20 +27,32 @@ const New: NextPage = () => {
   const [tags, setTags] = useState([""]);
   const [name, setName] = useState("");
   const [image, setImage] = useState<File>();
+  const [duration, setDuration] = useState({ minutes: 0, hours: 0 });
 
   const handleCreate = async () => {
-    console.log(name);
-    console.log("ingredients?", ingredients);
-    console.log("steps?", steps);
-    console.log("tags?", tags);
+    //console.log(name);
+    //console.log("ingredients?", ingredients);
+    //console.log("steps?", steps);
+    //console.log("tags?", tags);
 
     if (!session?.user?.id) return;
     if (!image) return;
+    if (!duration) return;
+    if (!name) return;
 
     const baseConvertImage = await toBase64(image);
 
     const uploadedImageUrl = await uploadImage({ image: baseConvertImage });
-    console.log(uploadedImageUrl);
+    //console.log(uploadedImageUrl);
+
+    //console.log(duration);
+    const durationMs = toMiliseconds(
+      duration.hours === NaN ? 0 : duration.hours,
+      duration.minutes === NaN ? 0 : duration.minutes,
+      0
+    );
+
+    //console.log(durationMs);
 
     createRecipe({
       authorId: session?.user?.id,
@@ -48,7 +61,7 @@ const New: NextPage = () => {
       steps: steps,
       tags: tags,
       image: uploadedImageUrl,
-      timeRequired: 34,
+      timeRequired: durationMs,
     });
   };
 
@@ -107,7 +120,41 @@ const New: NextPage = () => {
                   </label>
                   <label>
                     Time required
-                    <input className="html-duration-picker"></input>
+                    <input
+                      type="number"
+                      placeholder="Hours"
+                      min={0}
+                      step="1"
+                      onChange={(e) => {
+                        const num = Number.parseInt(e.target.value);
+                        if (num < 0) e.target.value = "0";
+                        if (!Number.isInteger(num))
+                          e.target.value = Math.round(num).toString();
+
+                        const _duration = duration;
+                        _duration.hours = num;
+                        setDuration(_duration);
+                        console.log(duration);
+                      }}
+                    />
+                    <input
+                      type="number"
+                      placeholder="Minutes"
+                      max={59}
+                      min={0}
+                      step="1"
+                      onChange={(e) => {
+                        const num = Number.parseInt(e.target.value);
+                        if (num > 59) e.target.value = "59";
+                        if (!Number.isInteger(num))
+                          e.target.value = Math.round(num).toString();
+
+                        const _duration = duration;
+                        _duration.minutes = num;
+                        setDuration(_duration);
+                        console.log(duration);
+                      }}
+                    />
                   </label>
                   <DynamicInput
                     setState={setIngredients}
