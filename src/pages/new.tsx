@@ -4,7 +4,6 @@ import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
-import { ImageError } from "next/dist/server/image-optimizer";
 import { toBase64 } from "../utils/base64";
 
 const New: NextPage = () => {
@@ -19,7 +18,7 @@ const New: NextPage = () => {
   const {
     isLoading: uploadIsLoading,
     error: uploadError,
-    mutate: uploadImage,
+    mutateAsync: uploadImage,
   } = trpc.useMutation(["image.upload"]);
 
   const [ingredients, setIngredients] = useState([""]);
@@ -39,17 +38,18 @@ const New: NextPage = () => {
 
     const baseConvertImage = await toBase64(image);
 
-    uploadImage({ image: baseConvertImage });
+    const uploadedImageUrl = await uploadImage({ image: baseConvertImage });
+    console.log(uploadedImageUrl);
 
-    /* createRecipe({
+    createRecipe({
       authorId: session?.user?.id,
       name: name,
       ingredients: ingredients,
       steps: steps,
       tags: tags,
-      image: "",
+      image: uploadedImageUrl,
       timeRequired: 34,
-    }); */
+    });
   };
 
   if (status === "loading") {
@@ -93,15 +93,22 @@ const New: NextPage = () => {
                       onChange={(e) => setName(e.target.value)}
                     />
                   </label>
-                  <input
-                    onChange={(e) => {
-                      //not nice but i dont know ts
-                      setImage(e.target.files![0]);
-                    }}
-                    accept=".jpg, .png, .jpeg"
-                    className="mb-2 fileInput"
-                    type="file"
-                  ></input>
+                  <label>
+                    Image
+                    <input
+                      onChange={(e) => {
+                        //not nice but i dont know ts
+                        setImage(e.target.files![0]);
+                      }}
+                      accept=".jpg, .png, .jpeg"
+                      className="mb-2 fileInput"
+                      type="file"
+                    ></input>
+                  </label>
+                  <label>
+                    Time required
+                    <input className="html-duration-picker"></input>
+                  </label>
                   <DynamicInput
                     setState={setIngredients}
                     state={ingredients}

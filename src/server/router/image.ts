@@ -27,12 +27,14 @@ export const imageRouter = createRouter()
     }),
     resolve: async ({ input, ctx }) => {
       //console.log("file?", input.file);
-      cloudinary.uploader.upload(
+      const { secure_url } = await cloudinary.uploader.upload(
         input.image,
         { folder: "slurpuff" },
         function (error, result) {
           console.log(result, error);
         }
       );
+
+      return secure_url;
     },
   });
