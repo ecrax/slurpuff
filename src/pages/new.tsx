@@ -4,8 +4,8 @@ import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
-import { toBase64 } from "../utils/base64";
 import { toMiliseconds } from "../utils/time";
+import { env } from "process";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -16,12 +16,6 @@ const New: NextPage = () => {
     mutate: createRecipe,
   } = trpc.useMutation(["recipe.create"]);
 
-  const {
-    isLoading: uploadIsLoading,
-    error: uploadError,
-    mutateAsync: uploadImage,
-  } = trpc.useMutation(["image.upload"]);
-
   const [ingredients, setIngredients] = useState([""]);
   const [steps, setSteps] = useState([""]);
   const [tags, setTags] = useState([""]);
@@ -29,6 +23,22 @@ const New: NextPage = () => {
   const [image, setImage] = useState<File>();
   const [duration, setDuration] = useState({ minutes: 0, hours: 0 });
 
+  const uploadImage = async (image: File) => {
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "slurpuff");
+    data.append("cloud_name", "slurpuff");
+    //data.append("api_key", env.CLOUDINARY_API_KEY ?? "");
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/ecrax/image/upload",
+      {
+        method: "post",
+        body: data,
+      }
+    );
+    const resData = await res.json();
+    return resData.url;
+  };
   const handleCreate = async () => {
     //console.log(name);
     //console.log("ingredients?", ingredients);
@@ -40,9 +50,7 @@ const New: NextPage = () => {
     if (!duration) return;
     if (!name) return;
 
-    const baseConvertImage = await toBase64(image);
-
-    const uploadedImageUrl = await uploadImage({ image: baseConvertImage });
+    const uploadedImageUrl = await uploadImage(image);
     //console.log(uploadedImageUrl);
 
     //console.log(duration);
@@ -54,15 +62,22 @@ const New: NextPage = () => {
 
     //console.log(durationMs);
 
-    createRecipe({
-      authorId: session?.user?.id,
-      name: name,
-      ingredients: ingredients,
-      steps: steps,
-      tags: tags,
-      image: uploadedImageUrl,
-      timeRequired: durationMs,
-    });
+    createRecipe(
+      {
+        authorId: session?.user?.id,
+        name: name,
+        ingredients: ingredients,
+        steps: steps,
+        tags: tags,
+        image: uploadedImageUrl,
+        timeRequired: durationMs,
+      },
+      {
+        onSuccess(data, variables, context) {
+          console.log("creation successfull");
+        },
+      }
+    );
   };
 
   if (status === "loading") {
@@ -170,7 +185,7 @@ const New: NextPage = () => {
                   <button disabled={createIsLoading} onClick={handleCreate}>
                     Create
                   </button>
-                  <p>{createError ? createError.message : ""}</p>
+                  <p>{createError?.message ? createError.message : ""}</p>
                 </form>
               </main>
             </>
