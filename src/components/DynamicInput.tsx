@@ -9,7 +9,14 @@ const DynamicInput: React.FC<{
       {name}
       {state.map((field, i) => (
         <div key={i}>
-          <input type="text" />
+          <input
+            type="text"
+            onChange={(e) => {
+              const _state = [...state];
+              _state[i] = e.target.value;
+              setState(_state);
+            }}
+          />
           <button
             onClick={() => {
               setState([...state, ""]);
