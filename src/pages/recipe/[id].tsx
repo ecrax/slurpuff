@@ -12,7 +12,6 @@ const RecipePage: NextPage = () => {
   if (!id || typeof id !== "string") return <div>No id</div>;
 
   const _id = Number.parseInt(id);
-
   if (Number.isNaN(_id)) return <p>Please pass a number</p>;
 
   return <RecipePageContent id={_id} />;
@@ -25,6 +24,8 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
     { id: id },
   ]);
 
+  if (status === "loading") return <p>Loading</p>;
+
   return (
     <>
       <Head>
@@ -34,55 +35,57 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen p-8 mx-auto">
-        {session && (
-          <>
-            <nav className="flex flex-row justify-between">
-              <p>Signed in as {session.user?.email}</p>
-              <button
-                onClick={() => {
-                  signOut();
-                }}
-              >
-                Sign out
-              </button>
-            </nav>
-            <main className="flex flex-col items-center justify-center">
-              {!isLoading ? (
-                <div>
-                  <Image
-                    src={recipe?.image ?? ""}
-                    width={300}
-                    height={200}
-                    alt={recipe?.name}
-                    objectFit="contain"
-                  />
-                  <div>{recipe?.name}</div>
-                  <div>
-                    {recipe?.tags.map((t) => (
-                      <div key={t}>{t}</div>
-                    ))}
-                  </div>
-                  <div>
-                    <p>Ingredients</p>
-                    {recipe?.ingredients.map((ingr) => (
-                      <div key={ingr}>{ingr}</div>
-                    ))}
-                  </div>
-                  <div>
-                    <p>Steps</p>
-                    {recipe?.steps.map((s, i) => (
-                      <div key={s}>
-                        {i + 1}.{" " + s}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p>Loading...</p>
-              )}
-            </main>
-          </>
+        {session ? (
+          <nav className="flex flex-row justify-between">
+            <p>Signed in as {session.user?.email}</p>
+            <button
+              onClick={() => {
+                signOut();
+              }}
+            >
+              Sign out
+            </button>
+          </nav>
+        ) : (
+          <nav className="flex flex-row justify-between">
+            <div>You are not logged in</div>
+          </nav>
         )}
+        <main className="flex flex-col items-center justify-center">
+          {!isLoading ? (
+            <div>
+              <Image
+                src={recipe?.image ?? ""}
+                width={300}
+                height={200}
+                alt={recipe?.name}
+                objectFit="contain"
+              />
+              <div>{recipe?.name}</div>
+              <div>
+                {recipe?.tags.map((t) => (
+                  <div key={t}>{t}</div>
+                ))}
+              </div>
+              <div>
+                <p>Ingredients</p>
+                {recipe?.ingredients.map((ingr) => (
+                  <div key={ingr}>{ingr}</div>
+                ))}
+              </div>
+              <div>
+                <p>Steps</p>
+                {recipe?.steps.map((s, i) => (
+                  <div key={s}>
+                    {i + 1}.{" " + s}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p>Loading...</p>
+          )}
+        </main>
       </div>
     </>
   );

@@ -81,7 +81,6 @@ const New: NextPage = () => {
   if (status === "loading") {
     return <p>Loading</p>;
   } else if (!session) {
-    console.log("test");
     return <p>Please Sign in</p>;
   } else {
     return (

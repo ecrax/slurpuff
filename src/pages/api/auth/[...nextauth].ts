@@ -24,6 +24,12 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.DISCORD_CLIENT_SECRET,
     }),
   ],
+  theme: {
+    colorScheme: "light",
+  },
+  pages: {
+    signIn: "/login",
+  },
 };
 
 export default NextAuth(authOptions);
