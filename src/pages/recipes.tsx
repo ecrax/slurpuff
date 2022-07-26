@@ -3,6 +3,7 @@ import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { msToTime } from "../utils/time";
 import { trpc } from "../utils/trpc";
 
 const Recipes: NextPage = () => {
@@ -54,10 +55,14 @@ const Recipes: NextPage = () => {
                       />
                       <div className="p-2">
                         <p>{recipe.name}</p>
-                        <p>
-                          {recipe.steps.length} Step
-                          {recipe.steps.length > 1 ? "s" : ""}
-                        </p>
+                        <div className="flex flex-row">
+                          <p>
+                            {recipe.steps.length} Step
+                            {recipe.steps.length > 1 ? "s" : ""}
+                          </p>
+                          <p className="px-2">•</p>
+                          <p>{msToTime(recipe.timeRequired)}</p>
+                        </div>
                       </div>
                     </div>
                   </Link>
