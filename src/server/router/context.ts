@@ -6,18 +6,14 @@ import { unstable_getServerSession as getServerSession } from "next-auth";
 import { authOptions as nextAuthOptions } from "../../pages/api/auth/[...nextauth]";
 import { prisma } from "../db/client";
 
-import { v2 as cloudinary } from "cloudinary";
-
-export const createContext = async (opts?: trpcNext.CreateNextContextOptions) => {
+export const createContext = async (
+  opts?: trpcNext.CreateNextContextOptions
+) => {
   const req = opts?.req;
   const res = opts?.res;
 
   const session =
     req && res && (await getServerSession(req, res, nextAuthOptions));
-
-  cloudinary.config({
-    secure: true,
-  });
 
   return {
     req,

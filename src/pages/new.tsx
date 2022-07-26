@@ -5,7 +5,6 @@ import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
 import { toMiliseconds } from "../utils/time";
-import { env } from "process";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -28,7 +27,6 @@ const New: NextPage = () => {
     data.append("file", image);
     data.append("upload_preset", "slurpuff");
     data.append("cloud_name", "slurpuff");
-    //data.append("api_key", env.CLOUDINARY_API_KEY ?? "");
     const res = await fetch(
       "https://api.cloudinary.com/v1_1/ecrax/image/upload",
       {
