@@ -1,4 +1,8 @@
 import React, { type Dispatch, type SetStateAction } from "react";
+import { OutlineButton } from "./Button";
+import { TextInput } from "./Input";
+import { PlusIcon, MinusIcon } from "@heroicons/react/solid";
+
 const DynamicInput: React.FC<{
   setState: Dispatch<SetStateAction<string[]>>;
   state: string[];
@@ -9,34 +13,38 @@ const DynamicInput: React.FC<{
       {name}
       {state.map((field, i) => (
         <div key={i}>
-          <input
-            type="text"
+          <TextInput
+            name="dynamicInput"
+            placeholder={`${i + 1}. ${name.slice(0, -1)}`}
             onChange={(e) => {
               const _state = [...state];
               _state[i] = e.target.value;
               setState(_state);
             }}
           />
-          <button
-            onClick={() => {
-              setState([...state, ""]);
-            }}
-          >
-            +
-          </button>
-          {state.length !== 1 && i === state.length - 1 && (
-            <button
-              onClick={() => {
-                const _state = [...state];
 
-                _state.splice(i, 1);
+          <div className="flex">
+            {i === state.length - 1 && (
+              <OutlineButton
+                icon={<PlusIcon />}
+                onClick={() => {
+                  setState([...state, ""]);
+                }}
+              />
+            )}
+            {state.length !== 1 && i === state.length - 1 && (
+              <OutlineButton
+                icon={<MinusIcon />}
+                onClick={() => {
+                  const _state = [...state];
 
-                setState(_state);
-              }}
-            >
-              -
-            </button>
-          )}
+                  _state.splice(i, 1);
+
+                  setState(_state);
+                }}
+              />
+            )}
+          </div>
         </div>
       ))}
     </label>

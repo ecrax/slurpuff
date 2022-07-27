@@ -39,19 +39,19 @@ const Recipes: NextPage = () => {
           </nav>
         )}
         <main className="flex flex-col items-center justify-center">
-          <div className="grid grid-cols-4 gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
             {recipes ? (
               recipes.map((recipe, i) => {
                 return (
                   <Link key={i} href={`/recipe/${recipe.id}`}>
-                    <div className="border-2 rounded-md border-amber-300">
+                    <div className="border-2 border-green-400 rounded-md">
                       <Image
                         width={300}
                         height={200}
                         src={recipe.image}
                         alt={recipe.name}
                         className="rounded"
-                        objectFit="contain"
+                        objectFit="cover"
                       />
                       <div className="p-2">
                         <p>{recipe.name}</p>

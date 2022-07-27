@@ -5,6 +5,9 @@ import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
 import { toMiliseconds } from "../utils/time";
+import { ImageInput, NumberInput, TextInput } from "../components/Input";
+import { FilledButton } from "../components/Button";
+import { PlusIcon } from "@heroicons/react/solid";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -37,28 +40,20 @@ const New: NextPage = () => {
     const resData = await res.json();
     return resData.url;
   };
-  const handleCreate = async () => {
-    //console.log(name);
-    //console.log("ingredients?", ingredients);
-    //console.log("steps?", steps);
-    //console.log("tags?", tags);
 
+  const handleCreate = async () => {
     if (!session?.user?.id) return;
     if (!image) return;
     if (!duration) return;
     if (!name) return;
 
     const uploadedImageUrl = await uploadImage(image);
-    //console.log(uploadedImageUrl);
 
-    //console.log(duration);
     const durationMs = toMiliseconds(
       duration.hours === NaN ? 0 : duration.hours,
       duration.minutes === NaN ? 0 : duration.minutes,
       0
     );
-
-    //console.log(durationMs);
 
     createRecipe(
       {
@@ -113,28 +108,28 @@ const New: NextPage = () => {
                 >
                   <label>
                     Name
-                    <input
-                      type="text"
+                    <TextInput
+                      name="name"
+                      placeholder="Name"
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
                   </label>
                   <label>
                     Image
-                    <input
+                    <ImageInput
+                      name="image"
                       onChange={(e) => {
                         //not nice but i dont know ts
                         setImage(e.target.files![0]);
                       }}
-                      accept=".jpg, .png, .jpeg"
-                      className="mb-2 fileInput"
-                      type="file"
-                    ></input>
+                    />
                   </label>
                   <label>
                     Time required
-                    <input
-                      type="number"
+                    <NumberInput
                       placeholder="Hours"
+                      name="hours"
                       min={0}
                       step="1"
                       onChange={(e) => {
@@ -146,12 +141,11 @@ const New: NextPage = () => {
                         const _duration = duration;
                         _duration.hours = num;
                         setDuration(_duration);
-                        console.log(duration);
                       }}
                     />
-                    <input
-                      type="number"
+                    <NumberInput
                       placeholder="Minutes"
+                      name="minutes"
                       max={59}
                       min={0}
                       step="1"
@@ -164,7 +158,6 @@ const New: NextPage = () => {
                         const _duration = duration;
                         _duration.minutes = num;
                         setDuration(_duration);
-                        console.log(duration);
                       }}
                     />
                   </label>
@@ -179,9 +172,13 @@ const New: NextPage = () => {
                     name={"Steps"}
                   />
                   <DynamicInput setState={setTags} state={tags} name={"Tags"} />
-                  <button disabled={createIsLoading} onClick={handleCreate}>
+                  <FilledButton
+                    disabled={createIsLoading}
+                    onClick={handleCreate}
+                    icon={<PlusIcon />}
+                  >
                     Create
-                  </button>
+                  </FilledButton>
                   <p>{createError?.message ? createError.message : ""}</p>
                 </form>
               </main>
