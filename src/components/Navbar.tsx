@@ -1,0 +1,74 @@
+import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
+
+const Navbar = () => {
+  const { data: session, status } = useSession();
+
+  if (status === "loading")
+    return (
+      <nav className="flex flex-row justify-between">
+        <div>Loading...</div>
+      </nav>
+    );
+
+  return (
+    <>
+      <nav className="navbar">
+        <div className="flex-1">
+          <div className="text-xl normal-case btn btn-ghost">
+            <Link href="/recipes">recipes</Link>
+          </div>
+        </div>
+        {session ? (
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full">
+                <img
+                  src={
+                    session.user?.image ??
+                    `https://avatars.dicebear.com/api/pixel-art/${session.user?.name}.svg`
+                  }
+                  alt="Avatar"
+                />
+              </div>
+            </label>
+            <ul
+              tabIndex={0}
+              className="p-2 mt-3 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <a>Profile</a>
+              </li>
+              <li>
+                <Link href="/new">New</Link>
+              </li>
+              <li>
+                <a>Settings</a>
+              </li>
+              <li>
+                <a
+                  onClick={() => {
+                    signOut();
+                  }}
+                >
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <a
+            className="btn"
+            onClick={() => {
+              signIn();
+            }}
+          >
+            log in
+          </a>
+        )}
+      </nav>
+    </>
+  );
+};
+
+export default Navbar;

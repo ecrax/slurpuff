@@ -3,15 +3,12 @@ import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 import { msToTime } from "../utils/time";
 import { trpc } from "../utils/trpc";
 
 const Recipes: NextPage = () => {
-  const { data: session, status } = useSession();
-
   const { data: recipes } = trpc.useQuery(["recipe.getAll"]);
-
-  if (status === "loading") return <p>Loading</p>;
 
   return (
     <>
@@ -22,29 +19,14 @@ const Recipes: NextPage = () => {
       </Head>
 
       <div className="container h-screen p-8 mx-auto">
-        {session ? (
-          <nav className="flex flex-row justify-between">
-            <p>Signed in as {session.user?.email}</p>
-            <button
-              onClick={() => {
-                signOut();
-              }}
-            >
-              Sign out
-            </button>
-          </nav>
-        ) : (
-          <nav className="flex flex-row justify-between">
-            <div>You are not logged in</div>
-          </nav>
-        )}
+        <Navbar />
         <main className="flex flex-col items-center justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
             {recipes ? (
               recipes.map((recipe, i) => {
                 return (
                   <Link key={i} href={`/recipe/${recipe.id}`}>
-                    <div className="border-2 border-green-400 rounded-md cursor-pointer">
+                    <div className="border-2 rounded-md cursor-pointer border-primary card">
                       <Image
                         width={300}
                         height={200}
@@ -53,15 +35,25 @@ const Recipes: NextPage = () => {
                         className="rounded"
                         objectFit="cover"
                       />
-                      <div className="p-2">
-                        <p>{recipe.name}</p>
-                        <div className="flex flex-row">
-                          <p>
+                      <div className="p-2 card-body">
+                        <h2 className="card-title">{recipe.name}</h2>
+                        <div className="card-actions">
+                          <p className="badge badge-primary">
                             {recipe.steps.length} Step
                             {recipe.steps.length > 1 ? "s" : ""}
                           </p>
-                          <p className="px-2">•</p>
-                          <p>{msToTime(recipe.timeRequired)}</p>
+
+                          <p className="badge badge-primary">
+                            {msToTime(recipe.timeRequired)}
+                          </p>
+
+                          {recipe.tags.map((t, i) => {
+                            return (
+                              <p className="badge badge-ghost" key={i}>
+                                {t}
+                              </p>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>

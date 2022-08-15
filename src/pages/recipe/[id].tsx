@@ -1,8 +1,9 @@
 import type { NextPage } from "next";
-import { signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import Navbar from "../../components/Navbar";
+import { msToTime } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
 const RecipePage: NextPage = () => {
@@ -18,13 +19,10 @@ const RecipePage: NextPage = () => {
 };
 
 const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
-  const { data: session, status } = useSession();
   const { data: recipe, isLoading } = trpc.useQuery([
     "recipe.getById",
     { id: id },
   ]);
-
-  if (status === "loading") return <p>Loading</p>;
 
   return (
     <>
@@ -35,49 +33,54 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen p-8 mx-auto">
-        {session ? (
-          <nav className="flex flex-row justify-between">
-            <p>Signed in as {session.user?.email}</p>
-            <button
-              onClick={() => {
-                signOut();
-              }}
-            >
-              Sign out
-            </button>
-          </nav>
-        ) : (
-          <nav className="flex flex-row justify-between">
-            <div>You are not logged in</div>
-          </nav>
-        )}
-        <main className="flex flex-col items-center justify-center">
-          {!isLoading ? (
+        <Navbar />
+        <main className="flex flex-col items-center justify-center pb-16 prose">
+          {!isLoading && recipe ? (
             <div>
-              <Image
-                src={recipe?.image ?? ""}
-                width={300}
-                height={200}
-                alt={recipe?.name}
-                objectFit="contain"
-              />
-              <div>{recipe?.name}</div>
+              <div className="py-8">
+                <Image
+                  src={recipe.image ?? ""}
+                  width={300}
+                  height={200}
+                  alt={recipe.name}
+                  objectFit="contain"
+                />
+              </div>
+              <h1>{recipe.name}</h1>
+              <div className="space-x-2">
+                <p className="badge badge-primary">
+                  {recipe.steps.length} Step
+                  {recipe.steps.length > 1 ? "s" : ""}
+                </p>
+
+                <p className="badge badge-primary">
+                  {msToTime(recipe.timeRequired)}
+                </p>
+
+                {recipe.tags.map((t) => (
+                  <p className="badge badge-ghost" key={t}>
+                    {t}
+                  </p>
+                ))}
+              </div>
+
               <div>
-                {recipe?.tags.map((t) => (
-                  <div key={t}>{t}</div>
+                <h2>Ingredients</h2>
+                {recipe.ingredients.map((ingr) => (
+                  <div key={ingr}>
+                    <span className="font-bold">
+                      {ingr.substring(0, ingr.indexOf(" "))}
+                    </span>{" "}
+                    <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+                  </div>
                 ))}
               </div>
               <div>
-                <p>Ingredients</p>
-                {recipe?.ingredients.map((ingr) => (
-                  <div key={ingr}>{ingr}</div>
-                ))}
-              </div>
-              <div>
-                <p>Steps</p>
-                {recipe?.steps.map((s, i) => (
+                <h2>Steps</h2>
+                {recipe.steps.map((s, i) => (
                   <div key={s}>
-                    {i + 1}.{" " + s}
+                    <span className="font-bold">{i + 1}.</span>
+                    {" " + s}
                   </div>
                 ))}
               </div>

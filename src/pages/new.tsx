@@ -8,6 +8,8 @@ import { toMiliseconds } from "../utils/time";
 import { ImageInput, NumberInput, TextInput } from "../components/Input";
 import { FilledButton } from "../components/Button";
 import { PlusIcon } from "@heroicons/react/solid";
+import Navbar from "../components/Navbar";
+import styles from "../styles/New.module.css";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -87,102 +89,111 @@ const New: NextPage = () => {
         </Head>
 
         <div className="container h-screen p-8 mx-auto">
+          <Navbar />
           {session && (
-            <>
-              <nav className="flex flex-row justify-between">
-                <p>Signed in as {session.user?.email}</p>
-                <button
-                  onClick={() => {
-                    signOut();
-                  }}
-                >
-                  Sign out
-                </button>
-              </nav>
-              <main className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center">
+              <main className="prose">
                 <form
                   className="flex flex-col"
                   onSubmit={(e) => {
                     e.preventDefault();
                   }}
                 >
-                  <label>
-                    Name
-                    <TextInput
-                      name="name"
-                      placeholder="Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                  <div className="py-2">
+                    <label>
+                      <h3>Name</h3>
+                      <TextInput
+                        name="name"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <div className="py-2">
+                    <label>
+                      <h3>Image</h3>
+                      <ImageInput
+                        name="image"
+                        onChange={(e) => {
+                          //not nice but i dont know ts
+                          setImage(e.target.files![0]);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <div className="py-2">
+                    <label className={styles.inputGroupVerticalCustom}>
+                      <h3>Time required</h3>
+                      <NumberInput
+                        placeholder="Hours"
+                        name="hours"
+                        min={0}
+                        step="1"
+                        onChange={(e) => {
+                          const num = Number.parseInt(e.target.value);
+                          if (num < 0) e.target.value = "0";
+                          if (!Number.isInteger(num))
+                            e.target.value = Math.round(num).toString();
+                          const _duration = duration;
+                          _duration.hours = num;
+                          setDuration(_duration);
+                        }}
+                      />
+                      <NumberInput
+                        placeholder="Minutes"
+                        name="minutes"
+                        max={59}
+                        min={0}
+                        step="1"
+                        onChange={(e) => {
+                          const num = Number.parseInt(e.target.value);
+                          if (num > 59) e.target.value = "59";
+                          if (!Number.isInteger(num))
+                            e.target.value = Math.round(num).toString();
+                          const _duration = duration;
+                          _duration.minutes = num;
+                          setDuration(_duration);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <div className="py-2">
+                    <DynamicInput
+                      setState={setIngredients}
+                      state={ingredients}
+                      name={"Ingredients"}
                     />
-                  </label>
-                  <label>
-                    Image
-                    <ImageInput
-                      name="image"
-                      onChange={(e) => {
-                        //not nice but i dont know ts
-                        setImage(e.target.files![0]);
-                      }}
+                  </div>
+                  <div className="py-2">
+                    <DynamicInput
+                      setState={setSteps}
+                      state={steps}
+                      name={"Steps"}
                     />
-                  </label>
-                  <label>
-                    Time required
-                    <NumberInput
-                      placeholder="Hours"
-                      name="hours"
-                      min={0}
-                      step="1"
-                      onChange={(e) => {
-                        const num = Number.parseInt(e.target.value);
-                        if (num < 0) e.target.value = "0";
-                        if (!Number.isInteger(num))
-                          e.target.value = Math.round(num).toString();
-
-                        const _duration = duration;
-                        _duration.hours = num;
-                        setDuration(_duration);
-                      }}
+                  </div>
+                  <div className="py-2">
+                    <DynamicInput
+                      setState={setTags}
+                      state={tags}
+                      name={"Tags"}
                     />
-                    <NumberInput
-                      placeholder="Minutes"
-                      name="minutes"
-                      max={59}
-                      min={0}
-                      step="1"
-                      onChange={(e) => {
-                        const num = Number.parseInt(e.target.value);
-                        if (num > 59) e.target.value = "59";
-                        if (!Number.isInteger(num))
-                          e.target.value = Math.round(num).toString();
-
-                        const _duration = duration;
-                        _duration.minutes = num;
-                        setDuration(_duration);
-                      }}
-                    />
-                  </label>
-                  <DynamicInput
-                    setState={setIngredients}
-                    state={ingredients}
-                    name={"Ingredients"}
-                  />
-                  <DynamicInput
-                    setState={setSteps}
-                    state={steps}
-                    name={"Steps"}
-                  />
-                  <DynamicInput setState={setTags} state={tags} name={"Tags"} />
-                  <FilledButton
-                    disabled={createIsLoading}
-                    onClick={handleCreate}
-                    icon={<PlusIcon />}
-                  >
-                    Create
-                  </FilledButton>
-                  <p>{createError?.message ? createError.message : ""}</p>
+                  </div>
+                  <div className="py-2">
+                    <FilledButton
+                      disabled={createIsLoading}
+                      onClick={handleCreate}
+                      icon={<PlusIcon />}
+                    >
+                      Create
+                    </FilledButton>
+                  </div>
+                  <p className="py-2">
+                    {createError?.message ? createError.message : ""}
+                  </p>
                 </form>
               </main>
-            </>
+            </div>
           )}
         </div>
       </>
