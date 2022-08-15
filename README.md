@@ -2,10 +2,8 @@
 
 This is an app bootstrapped according to the [init.tips](https://init.tips) stack, also known as the T3-Stack.
 
-## DBs
-postgresql-fluffy-80215: main db
-
-postgresql-tapered-12459: shadow db
+## DB
+Railway Postgres
 
 ## Notes
 https://tanstack.com/query/v4/docs/guides/dependent-queries

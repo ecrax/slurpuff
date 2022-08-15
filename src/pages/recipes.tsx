@@ -44,7 +44,7 @@ const Recipes: NextPage = () => {
               recipes.map((recipe, i) => {
                 return (
                   <Link key={i} href={`/recipe/${recipe.id}`}>
-                    <div className="border-2 border-green-400 rounded-md">
+                    <div className="border-2 border-green-400 rounded-md cursor-pointer">
                       <Image
                         width={300}
                         height={200}
