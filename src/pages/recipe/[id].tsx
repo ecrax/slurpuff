@@ -45,6 +45,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                 priority
               />
             </div>
+
             <main className="flex flex-col items-center justify-center pb-16 prose">
               <div>
                 <h1 className="pt-8 mb-2">{recipe.name}</h1>
