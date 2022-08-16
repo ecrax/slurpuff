@@ -29,6 +29,7 @@ export const recipeRouter = createRouter()
       timeRequired: z.number(),
       authorId: z.string(),
       tags: z.array(z.string()),
+      notes: z.string().nullish(),
     }),
     resolve: async ({ input, ctx }) => {
       if (!ctx.session) {

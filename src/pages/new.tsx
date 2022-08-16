@@ -24,6 +24,7 @@ const New: NextPage = () => {
   const [steps, setSteps] = useState([""]);
   const [tags, setTags] = useState([""]);
   const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
   const [image, setImage] = useState<File>();
   const [duration, setDuration] = useState({ minutes: 0, hours: 0 });
 
@@ -66,6 +67,7 @@ const New: NextPage = () => {
         tags: tags,
         image: uploadedImageUrl,
         timeRequired: durationMs,
+        notes: notes,
       },
       {
         onSuccess(data, variables, context) {
@@ -107,6 +109,17 @@ const New: NextPage = () => {
                         placeholder="Name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <div className="py-2">
+                    <label>
+                      <h3>Notes</h3>
+                      <TextInput
+                        name="notes"
+                        placeholder="Notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
                       />
                     </label>
                   </div>

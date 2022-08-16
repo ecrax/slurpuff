@@ -34,61 +34,67 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
 
       <div className="container h-screen p-8 mx-auto">
         <Navbar />
-        <main className="flex flex-col items-center justify-center pb-16 prose">
-          {!isLoading && recipe ? (
-            <div>
-              <div className="py-8">
-                <Image
-                  src={recipe.image ?? ""}
-                  width={300}
-                  height={200}
-                  alt={recipe.name}
-                  objectFit="contain"
-                />
-              </div>
-              <h1>{recipe.name}</h1>
-              <div className="space-x-2">
-                <p className="badge badge-primary">
-                  {recipe.steps.length} Step
-                  {recipe.steps.length > 1 ? "s" : ""}
-                </p>
-
-                <p className="badge badge-primary">
-                  {msToTime(recipe.timeRequired)}
-                </p>
-
-                {recipe.tags.map((t) => (
-                  <p className="badge badge-ghost" key={t}>
-                    {t}
-                  </p>
-                ))}
-              </div>
-
-              <div>
-                <h2>Ingredients</h2>
-                {recipe.ingredients.map((ingr) => (
-                  <div key={ingr}>
-                    <span className="font-bold">
-                      {ingr.substring(0, ingr.indexOf(" "))}
-                    </span>{" "}
-                    <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <h2>Steps</h2>
-                {recipe.steps.map((s, i) => (
-                  <div key={s}>
-                    <span className="font-bold">{i + 1}.</span>
-                    {" " + s}
-                  </div>
-                ))}
-              </div>
+        {!isLoading && recipe ? (
+          <>
+            <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
+              <Image
+                src={recipe.image ?? ""}
+                alt={recipe.name}
+                objectFit="cover"
+                layout="fill"
+                priority
+              />
             </div>
-          ) : (
-            <p>Loading...</p>
-          )}
-        </main>
+            <main className="flex flex-col items-center justify-center pb-16 prose">
+              <div>
+                <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                <div className="space-x-2">
+                  <p className="badge badge-primary">
+                    {recipe.steps.length} Step
+                    {recipe.steps.length > 1 ? "s" : ""}
+                  </p>
+
+                  <p className="badge badge-primary">
+                    {msToTime(recipe.timeRequired)}
+                  </p>
+
+                  {recipe.tags.map((t) => (
+                    <p className="badge badge-ghost" key={t}>
+                      {t}
+                    </p>
+                  ))}
+                </div>
+
+                <div className="pt-8">
+                  <i>~ {recipe.notes}</i>
+                </div>
+
+                <div className="mt-8">
+                  <h2>Ingredients</h2>
+                  {recipe.ingredients.map((ingr) => (
+                    <div key={ingr}>
+                      <span className="font-bold">
+                        {ingr.substring(0, ingr.indexOf(" "))}
+                      </span>{" "}
+                      <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <h2>Steps</h2>
+                  {recipe.steps.map((s, i) => (
+                    <div key={s}>
+                      <span className="font-bold">{i + 1}.</span>
+                      {" " + s}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </main>
+          </>
+        ) : (
+          <p>Loading...</p>
+        )}
       </div>
     </>
   );

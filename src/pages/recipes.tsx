@@ -20,8 +20,8 @@ const Recipes: NextPage = () => {
 
       <div className="container h-screen p-8 mx-auto">
         <Navbar />
-        <main className="flex flex-col items-center justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
+        <main className="flex flex-col items-center justify-center mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
             {recipes ? (
               recipes.map((recipe, i) => {
                 return (
