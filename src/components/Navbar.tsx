@@ -13,7 +13,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="px-0 navbar">
         <div className="flex-1">
           <div className="text-xl normal-case btn btn-ghost">
             <Link href="/recipes">recipes</Link>
@@ -25,8 +25,10 @@ const Navbar = () => {
               <div className="w-10 rounded-full">
                 <img
                   src={
-                    session.user?.image ??
-                    `https://avatars.dicebear.com/api/pixel-art/${session.user?.name}.svg`
+                    !session.user?.image ||
+                    session.user.image.includes("google")
+                      ? `https://avatars.dicebear.com/api/pixel-art/${session.user?.name}.svg`
+                      : session.user?.image
                   }
                   alt="Avatar"
                 />

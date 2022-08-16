@@ -1,12 +1,8 @@
 import type { NextPage } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import { trpc } from "../utils/trpc";
+import Navbar from "../components/Navbar";
 
 const Home: NextPage = () => {
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
-  const { data: session } = useSession();
-
   return (
     <>
       <Head>
@@ -15,37 +11,8 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container flex flex-col items-center justify-center h-screen p-4 mx-auto">
-        <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-gray-700">
-          Create <span className="text-purple-300">T3</span> App
-        </h1>
-
-        {!session && (
-          <button
-            onClick={() => {
-              signIn();
-            }}
-          >
-            Sign in
-          </button>
-        )}
-
-        {session && (
-          <>
-            <p>Signed in as {session.user?.email}</p>
-            <button
-              onClick={() => {
-                signOut();
-              }}
-            >
-              Sign out
-            </button>
-          </>
-        )}
-
-        <div className="flex items-center justify-center w-full pt-6 text-2xl text-blue-500">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
-        </div>
+      <main className="container flex flex-col h-screen p-4 mx-auto">
+        <Navbar />
       </main>
     </>
   );

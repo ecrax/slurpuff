@@ -28,7 +28,7 @@ export const OutlineButton: React.FC<{
   return (
     <button
       type="button"
-      className="btn btn-outline"
+      className="mt-2 btn btn-outline"
       onClick={onClick}
       disabled={disabled}
     >

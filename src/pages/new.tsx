@@ -92,7 +92,7 @@ const New: NextPage = () => {
           <Navbar />
           {session && (
             <div className="flex flex-col items-center justify-center">
-              <main className="prose">
+              <main className="w-full prose">
                 <form
                   className="flex flex-col"
                   onSubmit={(e) => {

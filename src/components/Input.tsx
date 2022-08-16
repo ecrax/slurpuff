@@ -20,7 +20,7 @@ export const NumberInput: React.FC<{
       step={step}
       min={min}
       max={max}
-      className="w-full max-w-xs input input-bordered"
+      className="w-full input input-bordered"
     />
   );
 };
@@ -39,7 +39,7 @@ export const TextInput: React.FC<{
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="w-full max-w-xs input input-bordered"
+      className="w-full input input-bordered"
     />
   );
 };
@@ -55,7 +55,7 @@ export const ImageInput: React.FC<{
       onChange={onChange}
       accept=".jpg, .png, .jpeg"
       type="file"
-      className="w-full max-w-xs input input-bordered"
+      className="block w-full border rounded-lg cursor-pointer file:hover:border-r-base-100 file:mr-2 file:border-base-100 border-base-300 file:hover:bg-transparent file:border-r-1 file:border-l-0 file:border-t-0 file:border-b-0 file:rounded-none file:btn file:bg-transparent file:text-neutral bg-inherit"
     />
   );
 };
