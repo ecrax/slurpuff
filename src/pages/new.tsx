@@ -10,9 +10,11 @@ import { FilledButton } from "../components/Button";
 import { PlusIcon } from "@heroicons/react/solid";
 import Navbar from "../components/Navbar";
 import styles from "../styles/New.module.css";
+import { useRouter } from "next/router";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const {
     isLoading: createIsLoading,
@@ -72,6 +74,7 @@ const New: NextPage = () => {
       {
         onSuccess(data, variables, context) {
           console.log("creation successfull");
+          router.push("/");
         },
       }
     );
@@ -90,8 +93,7 @@ const New: NextPage = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <div className="container h-screen p-8 mx-auto">
-          <Navbar />
+        <div className="container h-screen px-8 mx-auto">
           {session && (
             <div className="flex flex-col items-center justify-center">
               <main className="w-full prose">

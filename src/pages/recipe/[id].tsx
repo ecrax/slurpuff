@@ -32,8 +32,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="container h-screen p-8 mx-auto">
-        <Navbar />
+      <div className="container h-screen px-8 mx-auto">
         {!isLoading && recipe ? (
           <>
             <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">

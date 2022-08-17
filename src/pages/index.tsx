@@ -11,9 +11,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container flex flex-col h-screen p-4 mx-auto">
-        <Navbar />
-      </main>
+      <main className="container flex flex-col h-screen p-4 mx-auto"></main>
     </>
   );
 };
