@@ -56,7 +56,7 @@ const New: NextPage = () => {
         notes: notes.trim(),
       },
       {
-        onSuccess(data, variables, context) {
+        onSuccess() {
           console.log("creation successfull");
           router.push("/");
         },

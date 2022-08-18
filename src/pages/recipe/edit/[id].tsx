@@ -120,7 +120,7 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
         notes: notes === oldRecipe.notes ? undefined : notes?.trim(),
       },
       {
-        onSuccess(data, variables, context) {
+        onSuccess() {
           console.log("update successfull");
           router.push(`/recipe/${oldRecipe.id}`);
         },
