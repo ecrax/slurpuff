@@ -1,4 +1,4 @@
-import React, { type Dispatch, type SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { OutlineButton } from "./Button";
 import { TextInput } from "./Input";
 import { PlusIcon, MinusIcon } from "@heroicons/react/solid";

@@ -1,5 +1,3 @@
-import React from "react";
-
 export const FilledButton: React.FC<{
   children?: React.ReactNode;
   onClick: React.MouseEventHandler;

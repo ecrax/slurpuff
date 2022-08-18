@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import React from "react";
 import { msToTimeString } from "../utils/time";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import type { Recipe } from "@prisma/client";
