@@ -24,7 +24,7 @@ const RecipeCard: React.FC<{ recipe: Recipe; dropdown?: boolean }> = ({
             <h2 className="card-title">{recipe.name}</h2>
 
             {dropdown && (
-              <div className="dropdown">
+              <div className="dropdown dropdown-left lg:dropdown-right">
                 <label
                   tabIndex={0}
                   className="btn btn-ghost btn-xs"

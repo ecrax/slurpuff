@@ -50,7 +50,7 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
                   className="rounded-full"
                 />
               </div>
-              <div className="">
+              <div>
                 <h1 className="py-8 mb-2 text-4xl font-bold">
                   {!(user.firstName && user.lastName)
                     ? user.name
