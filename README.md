@@ -8,7 +8,7 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [ ] Rate recipes (only an initial star rating, or rated by multiple?)
 - [ ] start displaying recipes by name and not by id in the url
 - [ ] ability to save recipes
-
+- [ ] eventually switch to planetscale
 
 ## DB
 Railway Postgres

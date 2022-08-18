@@ -20,6 +20,14 @@ export const recipeRouter = createRouter()
       return recipe;
     },
   })
+  .middleware(async ({ ctx, next }) => {
+    // Any queries or mutations after this middleware will
+    // raise an error unless there is a current session
+    if (!ctx.session) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return next();
+  })
   .mutation("create", {
     input: z.object({
       name: z.string(),
@@ -32,10 +40,6 @@ export const recipeRouter = createRouter()
       notes: z.string().nullish(),
     }),
     resolve: async ({ input, ctx }) => {
-      if (!ctx.session) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
       await ctx.prisma.recipe.create({
         data: input,
       });

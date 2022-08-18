@@ -1,8 +1,8 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import Navbar from "../../components/Navbar";
 import { msToTime } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
@@ -19,10 +19,14 @@ const RecipePage: NextPage = () => {
 };
 
 const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
-  const { data: recipe, isLoading } = trpc.useQuery([
+  const { data: recipe, isLoading: isRecipeLoading } = trpc.useQuery([
     "recipe.getById",
     { id: id },
   ]);
+  const { data: user, isLoading: isLoading } = trpc.useQuery(
+    ["user.getUserById", { id: recipe?.authorId! }],
+    { enabled: !!recipe?.authorId }
+  );
 
   return (
     <>
@@ -33,7 +37,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading && recipe ? (
+        {!isLoading && !isRecipeLoading && recipe && user ? (
           <>
             <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
               <Image
@@ -48,20 +52,28 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
             <main className="flex flex-col items-center justify-center pb-16 prose">
               <div>
                 <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                <Link href={`/user/${user.id}`}>
+                  <p className="link">
+                    by{" "}
+                    {!(user.firstName && user.lastName)
+                      ? user.name
+                      : user.firstName + " " + user.lastName}
+                  </p>
+                </Link>
                 <div className="space-x-2">
-                  <p className="badge badge-primary">
+                  <span className="badge badge-primary">
                     {recipe.steps.length} Step
                     {recipe.steps.length > 1 ? "s" : ""}
-                  </p>
+                  </span>
 
-                  <p className="badge badge-primary">
+                  <span className="badge badge-primary">
                     {msToTime(recipe.timeRequired)}
-                  </p>
+                  </span>
 
                   {recipe.tags.map((t) => (
-                    <p className="badge badge-ghost" key={t}>
+                    <span className="badge badge-ghost" key={t}>
                       {t}
-                    </p>
+                    </span>
                   ))}
                 </div>
 
