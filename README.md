@@ -9,6 +9,7 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [ ] start displaying recipes by name and not by id in the url
 - [ ] ability to save recipes
 - [ ] eventually switch to planetscale
+- [ ] proper form checking and error feedback
 
 ## DB
 Railway Postgres

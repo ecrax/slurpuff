@@ -1,6 +1,6 @@
 import DynamicInput from "./../components/DynamicInput";
 import type { NextPage } from "next";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
@@ -8,9 +8,9 @@ import { toMiliseconds } from "../utils/time";
 import { ImageInput, NumberInput, TextInput } from "../components/Input";
 import { FilledButton } from "../components/Button";
 import { PlusIcon } from "@heroicons/react/solid";
-import Navbar from "../components/Navbar";
 import styles from "../styles/New.module.css";
 import { useRouter } from "next/router";
+import { uploadImage } from "../utils/uploadImage";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -30,22 +30,6 @@ const New: NextPage = () => {
   const [image, setImage] = useState<File>();
   const [duration, setDuration] = useState({ minutes: 0, hours: 0 });
 
-  const uploadImage = async (image: File) => {
-    const data = new FormData();
-    data.append("file", image);
-    data.append("upload_preset", "slurpuff");
-    data.append("cloud_name", "slurpuff");
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/ecrax/image/upload",
-      {
-        method: "post",
-        body: data,
-      }
-    );
-    const resData = await res.json();
-    return resData.url;
-  };
-
   const handleCreate = async () => {
     if (!session?.user?.id) return;
     if (!image) return;
@@ -63,13 +47,13 @@ const New: NextPage = () => {
     createRecipe(
       {
         authorId: session?.user?.id,
-        name: name,
-        ingredients: ingredients,
-        steps: steps,
-        tags: tags,
+        name: name.trim(),
+        ingredients: ingredients.map((v) => v.trim()),
+        steps: steps.map((v) => v.trim()),
+        tags: tags.map((v) => v.trim()),
         image: uploadedImageUrl,
         timeRequired: durationMs,
-        notes: notes,
+        notes: notes.trim(),
       },
       {
         onSuccess(data, variables, context) {

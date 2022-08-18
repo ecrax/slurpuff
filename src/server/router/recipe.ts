@@ -44,4 +44,33 @@ export const recipeRouter = createRouter()
         data: input,
       });
     },
+  })
+  .mutation("update", {
+    input: z.object({
+      id: z.number(),
+      name: z.string().nullish(),
+      image: z.string().nullish(),
+      ingredients: z.array(z.string()).nullish(),
+      steps: z.array(z.string()).nullish(),
+      timeRequired: z.number().nullish(),
+      tags: z.array(z.string()).nullish(),
+      notes: z.string().nullish(),
+    }),
+    resolve: async ({ input, ctx }) => {
+      await ctx.prisma.recipe.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          id: input.id,
+          name: input.name ?? undefined,
+          image: input.image ?? undefined,
+          ingredients: input.ingredients ?? undefined,
+          steps: input.steps ?? undefined,
+          timeRequired: input.timeRequired ?? undefined,
+          tags: input.tags ?? undefined,
+          notes: input.notes ?? undefined,
+        },
+      });
+    },
   });

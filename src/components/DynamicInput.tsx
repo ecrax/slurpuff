@@ -13,9 +13,10 @@ const DynamicInput: React.FC<{
     <label className={styles.inputGroupVerticalCustom}>
       <h3>{name}</h3>
       {state.map((_field, i) => (
-        <>
+        <div key={`${i}_${name}`}>
           <TextInput
             name="dynamicInput"
+            value={state[i]}
             placeholder={`${i + 1}. ${name.slice(0, -1)}`}
             onChange={(e) => {
               const _state = [...state];
@@ -46,7 +47,7 @@ const DynamicInput: React.FC<{
               />
             )}
           </div>
-        </>
+        </div>
       ))}
     </label>
   );

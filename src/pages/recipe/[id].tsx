@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { msToTime } from "../../utils/time";
+import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
 const RecipePage: NextPage = () => {
@@ -67,7 +67,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                   </span>
 
                   <span className="badge badge-primary">
-                    {msToTime(recipe.timeRequired)}
+                    {msToTimeString(recipe.timeRequired)}
                   </span>
 
                   {recipe.tags.map((t) => (
