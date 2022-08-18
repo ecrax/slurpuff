@@ -1,11 +1,8 @@
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import RecipeCard from "../../components/RecipeCard";
-import { msToTime } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
 const UserPage: NextPage = () => {
