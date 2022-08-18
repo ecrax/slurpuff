@@ -3,6 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import RecipeCard from "../../components/RecipeCard";
 import { msToTime } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
@@ -53,42 +54,8 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
                 </h1>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-                {recipes.map((recipe, i) => {
-                  return (
-                    <Link key={i} href={`/recipe/${recipe.id}`}>
-                      <div className="border-2 rounded-md cursor-pointer border-primary card">
-                        <Image
-                          width={300}
-                          height={200}
-                          src={recipe.image}
-                          alt={recipe.name}
-                          className="rounded"
-                          objectFit="cover"
-                        />
-                        <div className="p-2 card-body">
-                          <h2 className="card-title">{recipe.name}</h2>
-                          <div className="card-actions">
-                            <p className="badge badge-primary">
-                              {recipe.steps.length} Step
-                              {recipe.steps.length > 1 ? "s" : ""}
-                            </p>
-
-                            <p className="badge badge-primary">
-                              {msToTime(recipe.timeRequired)}
-                            </p>
-
-                            {recipe.tags.map((t, i) => {
-                              return (
-                                <p className="badge badge-ghost" key={i}>
-                                  {t}
-                                </p>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  );
+                {recipes.map((recipe) => {
+                  return <RecipeCard key={recipe.id} recipe={recipe} />;
                 })}
               </div>
             </main>

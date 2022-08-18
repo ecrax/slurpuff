@@ -9,7 +9,6 @@ const envSchema = z.object({
   DISCORD_CLIENT_SECRET: z.string(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  CLOUDINARY_URL: z.string(),
 });
 
 module.exports.envSchema = envSchema;
