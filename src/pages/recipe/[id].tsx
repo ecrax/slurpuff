@@ -1,4 +1,6 @@
+import { ChevronDownIcon } from "@heroicons/react/solid";
 import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +10,7 @@ import { trpc } from "../../utils/trpc";
 
 const RecipePage: NextPage = () => {
   const { query } = useRouter();
+
   const { id } = query;
 
   if (!id || typeof id !== "string") return <div>No id</div>;
@@ -27,6 +30,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
     ["user.getUserById", { id: recipe?.authorId! }],
     { enabled: !!recipe?.authorId }
   );
+  const { data: session, status } = useSession();
 
   return (
     <>
@@ -37,7 +41,11 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading && !isRecipeLoading && recipe && user ? (
+        {!isLoading &&
+        !isRecipeLoading &&
+        status !== "loading" &&
+        recipe &&
+        user ? (
           <>
             <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
               <Image
@@ -51,7 +59,38 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
 
             <main className="flex flex-col items-center justify-center pb-16 prose">
               <div>
-                <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                <div className="flex items-baseline">
+                  <h1 className="pt-8 mb-2">{recipe.name}</h1>{" "}
+                  {session && session.user?.id === recipe.authorId && (
+                    <div className="ml-4 dropdown dropdown-left lg:dropdown-right">
+                      <label
+                        tabIndex={0}
+                        className="btn btn-ghost btn-sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ChevronDownIcon className="w-6 h-6" />
+                      </label>
+                      <ul
+                        tabIndex={0}
+                        className="z-40 p-2 shadow dropdown-content menu bg-base-100 rounded-box w-52"
+                      >
+                        <li onClick={(e) => e.stopPropagation()}>
+                          <Link href={`/recipe/edit/${recipe.id}`}>Edit</Link>
+                        </li>
+                        <li
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(
+                              `https://recipes.leo-kling.dev/recipe/${recipe.id}`
+                            );
+                          }}
+                        >
+                          <span>Share</span>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
                 <Link href={`/user/${user.id}`}>
                   <p className="link">
                     by{" "}

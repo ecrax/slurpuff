@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,6 +28,8 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
     { id: id },
   ]);
 
+  const { data: session, status } = useSession();
+
   return (
     <>
       <Head>
@@ -36,7 +39,11 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading && !isRecipesLoading && recipes && user ? (
+        {!isLoading &&
+        !isRecipesLoading &&
+        status !== "loading" &&
+        recipes &&
+        user ? (
           <>
             <main className="flex flex-col items-center justify-center pb-16">
               <div>
@@ -55,7 +62,13 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {recipes.map((recipe) => {
-                  return <RecipeCard key={recipe.id} recipe={recipe} />;
+                  return (
+                    <RecipeCard
+                      dropdown={session?.user?.id === recipe.authorId}
+                      key={recipe.id}
+                      recipe={recipe}
+                    />
+                  );
                 })}
               </div>
             </main>

@@ -5,7 +5,10 @@ import { msToTimeString } from "../utils/time";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import type { Recipe } from "@prisma/client";
 
-const RecipeCard: React.FC<{ recipe: Recipe }> = ({ recipe }) => {
+const RecipeCard: React.FC<{ recipe: Recipe; dropdown?: boolean }> = ({
+  recipe,
+  dropdown = false,
+}) => {
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="border-2 rounded-md cursor-pointer border-primary">
@@ -21,33 +24,35 @@ const RecipeCard: React.FC<{ recipe: Recipe }> = ({ recipe }) => {
           <div className="flex items-baseline justify-between">
             <h2 className="card-title">{recipe.name}</h2>
 
-            <div className="dropdown">
-              <label
-                tabIndex={0}
-                className="btn btn-ghost btn-xs"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ChevronDownIcon className="w-4 h-4" />
-              </label>
-              <ul
-                tabIndex={0}
-                className="z-40 p-2 shadow dropdown-content menu bg-base-100 rounded-box w-52"
-              >
-                <li onClick={(e) => e.stopPropagation()}>
-                  <Link href={`/recipe/edit/${recipe.id}`}>Edit</Link>
-                </li>
-                <li
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigator.clipboard.writeText(
-                      `https://recipes.leo-kling.dev/recipe/${recipe.id}`
-                    );
-                  }}
+            {dropdown && (
+              <div className="dropdown">
+                <label
+                  tabIndex={0}
+                  className="btn btn-ghost btn-xs"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <span>Share</span>
-                </li>
-              </ul>
-            </div>
+                  <ChevronDownIcon className="w-4 h-4" />
+                </label>
+                <ul
+                  tabIndex={0}
+                  className="z-40 p-2 shadow dropdown-content menu bg-base-100 rounded-box w-52"
+                >
+                  <li onClick={(e) => e.stopPropagation()}>
+                    <Link href={`/recipe/edit/${recipe.id}`}>Edit</Link>
+                  </li>
+                  <li
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(
+                        `https://recipes.leo-kling.dev/recipe/${recipe.id}`
+                      );
+                    }}
+                  >
+                    <span>Share</span>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
           <div className="card-actions">
             <p className="badge badge-primary">

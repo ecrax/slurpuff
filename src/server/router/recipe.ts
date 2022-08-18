@@ -48,6 +48,7 @@ export const recipeRouter = createRouter()
   .mutation("update", {
     input: z.object({
       id: z.number(),
+      authorId: z.string(),
       name: z.string().nullish(),
       image: z.string().nullish(),
       ingredients: z.array(z.string()).nullish(),
@@ -57,6 +58,10 @@ export const recipeRouter = createRouter()
       notes: z.string().nullish(),
     }),
     resolve: async ({ input, ctx }) => {
+      if (ctx.session?.user?.id !== input.authorId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
       await ctx.prisma.recipe.update({
         where: {
           id: input.id,

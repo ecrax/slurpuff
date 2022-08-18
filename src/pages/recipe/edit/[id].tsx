@@ -44,6 +44,8 @@ const LoadRecipe: React.FC<{ session: Session; id: number }> = ({
   ]);
 
   if (!isLoading && oldRecipe) {
+    if (oldRecipe.authorId !== session.user?.id)
+      return <div>You can only edit a recipe if you are the author</div>;
     return <EditContent session={session} oldRecipe={oldRecipe} />;
   } else {
     return <div>Loading...</div>;
@@ -101,6 +103,7 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
     updateRecipe(
       {
         id: oldRecipe.id,
+        authorId: oldRecipe.authorId,
         name: name === oldRecipe.name ? undefined : name.trim(),
         ingredients: arrayIsEqual(ingredients, oldRecipe.ingredients)
           ? undefined
