@@ -30,7 +30,11 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
     ["user.getUserById", { id: recipe?.authorId! }],
     { enabled: !!recipe?.authorId }
   );
+  const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
+
   const { data: session, status } = useSession();
+
+  const router = useRouter();
 
   return (
     <>
@@ -86,6 +90,18 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                           }}
                         >
                           <span>Share</span>
+                        </li>
+                        <li
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteRecipe({
+                              id: recipe.id,
+                              authorId: recipe.authorId,
+                            });
+                            router.replace("/recipes");
+                          }}
+                        >
+                          <span>Delete</span>
                         </li>
                       </ul>
                     </div>

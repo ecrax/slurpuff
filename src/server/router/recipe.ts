@@ -78,4 +78,18 @@ export const recipeRouter = createRouter()
         },
       });
     },
+  })
+  .mutation("delete", {
+    input: z.object({ id: z.number(), authorId: z.string() }),
+    resolve: async ({ input, ctx }) => {
+      if (ctx.session?.user?.id !== input.authorId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      await ctx.prisma.recipe.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    },
   });
