@@ -5,6 +5,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
@@ -22,10 +23,12 @@ const RecipePage: NextPage = () => {
 };
 
 const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
-  const { data: recipe, isLoading: isRecipeLoading } = trpc.useQuery([
-    "recipe.getById",
-    { id: id },
-  ]);
+  const {
+    data: recipe,
+    isLoading: isRecipeLoading,
+    error,
+  } = trpc.useQuery(["recipe.getById", { id: id }]);
+
   const { data: user, isLoading: isLoading } = trpc.useQuery(
     ["user.getUserById", { id: recipe?.authorId! }],
     { enabled: !!recipe?.authorId }
@@ -35,6 +38,12 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
   const { data: session, status } = useSession();
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (error?.data?.httpStatus === 404) {
+      router.push("/404");
+    }
+  });
 
   return (
     <>

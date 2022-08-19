@@ -17,6 +17,10 @@ export const recipeRouter = createRouter()
       const recipe = await ctx.prisma.recipe.findUnique({
         where: { id: input.id },
       });
+
+      if (recipe === null) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
       return recipe;
     },
   })
@@ -62,6 +66,13 @@ export const recipeRouter = createRouter()
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
+      const recipe = await ctx.prisma.recipe.findUniqueOrThrow({
+        where: { id: input.id },
+      });
+      if (recipe?.authorId !== ctx.session?.user?.id) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
       await ctx.prisma.recipe.update({
         where: {
           id: input.id,
@@ -85,6 +96,14 @@ export const recipeRouter = createRouter()
       if (ctx.session?.user?.id !== input.authorId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
+
+      const recipe = await ctx.prisma.recipe.findUniqueOrThrow({
+        where: { id: input.id },
+      });
+      if (recipe?.authorId !== ctx.session?.user?.id) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
 
       await ctx.prisma.recipe.delete({
         where: {
