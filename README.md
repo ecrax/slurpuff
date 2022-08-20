@@ -4,14 +4,14 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 
 ## Todo
 - [x] Profile Page (view own recipes)
-- [ ] Profile Page (view saved recipes)
-- [ ] ability to save recipes
 - [x] Edit Recipes (if current user is the creator)
-- [ ] Rate recipes (only an initial star rating, or rated by multiple?)
+- [ ] ability to save recipes
+- [ ] Profile Page (view saved recipes)
+- [ ] Rate recipes (only an initial star rating)
+- [ ] search
 - [ ] start displaying recipes by name and not by id in the url
 - [ ] eventually switch to planetscale
 - [ ] proper form checking and error feedback
-- [ ] search
 
 ## DB
 Railway Postgres
