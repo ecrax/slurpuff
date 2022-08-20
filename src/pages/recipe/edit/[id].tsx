@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusIcon } from "@heroicons/react/solid";
 import styles from "../../../styles/New.module.css";
 import { useRouter } from "next/router";
@@ -38,10 +38,19 @@ const LoadRecipe: React.FC<{ session: Session; id: number }> = ({
   id,
   session,
 }) => {
-  const { isLoading, data: oldRecipe } = trpc.useQuery([
-    "recipe.getById",
-    { id: id },
-  ]);
+  const {
+    isLoading,
+    data: oldRecipe,
+    error,
+  } = trpc.useQuery(["recipe.getById", { id: id }]);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (error?.data?.httpStatus === 404) {
+      router.push("/404");
+    }
+  });
 
   if (!isLoading && oldRecipe) {
     if (oldRecipe.authorId !== session.user?.id)

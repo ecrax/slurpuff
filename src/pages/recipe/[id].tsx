@@ -1,11 +1,15 @@
-import { ChevronDownIcon } from "@heroicons/react/solid";
+import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/outline";
+import {
+  BookmarkIcon as BookmarkIconSolid,
+  ChevronDownIcon,
+} from "@heroicons/react/solid";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
@@ -34,8 +38,18 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
     { enabled: !!recipe?.authorId }
   );
   const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
+  const { mutate: addSavedRecipe } = trpc.useMutation(["user.addSavedRecipe"]);
+  const { mutate: removeSavedRecipe } = trpc.useMutation([
+    "user.removeSavedRecipe",
+  ]);
 
   const { data: session, status } = useSession();
+
+  const [isSaved, setIsSaved] = useState(
+    !!user?.savedRecipes &&
+      user?.savedRecipes.length > 0 &&
+      user?.savedRecipes.includes(recipe?.id!)
+  );
 
   const router = useRouter();
 
@@ -72,49 +86,79 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
 
             <main className="flex flex-col items-center justify-center pb-16 prose">
               <div>
-                <div className="flex items-baseline">
+                <div className="flex flex-row items-baseline">
                   <h1 className="pt-8 mb-2">{recipe.name}</h1>{" "}
-                  {session && session.user?.id === recipe.authorId && (
-                    <div className="ml-4 dropdown dropdown-left lg:dropdown-right">
-                      <label
-                        tabIndex={0}
-                        className="btn btn-ghost btn-sm"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ChevronDownIcon className="w-6 h-6" />
-                      </label>
-                      <ul
-                        tabIndex={0}
-                        className="z-40 p-2 shadow dropdown-content menu bg-base-100 rounded-box w-52"
-                      >
-                        <li onClick={(e) => e.stopPropagation()}>
-                          <Link href={`/recipe/edit/${recipe.id}`}>Edit</Link>
-                        </li>
-                        <li
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(
-                              `https://recipes.leo-kling.dev/recipe/${recipe.id}`
-                            );
-                          }}
-                        >
-                          <span>Share</span>
-                        </li>
-                        <li
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteRecipe({
-                              id: recipe.id,
-                              authorId: recipe.authorId,
+                  <div className="flex items-center">
+                    {session && (
+                      <div
+                        className="ml-4 btn btn-ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isSaved) {
+                            //add to saved recipes
+                            addSavedRecipe({
+                              id: session.user?.id!,
+                              recipeId: recipe.id,
                             });
-                            router.replace("/recipes");
-                          }}
+                          } else {
+                            //remove from saved recipes
+                            removeSavedRecipe({
+                              id: session.user?.id!,
+                              recipeId: recipe.id,
+                            });
+                          }
+                          setIsSaved(!isSaved);
+                        }}
+                      >
+                        {isSaved ? (
+                          <BookmarkIconSolid className="w-4 h-4" />
+                        ) : (
+                          <BookmarkIconOutline className="w-4 h-4" />
+                        )}
+                      </div>
+                    )}
+                    {session && session.user?.id === recipe.authorId && (
+                      <div className="ml-4 dropdown dropdown-left lg:dropdown-right">
+                        <label
+                          tabIndex={0}
+                          className="btn btn-ghost btn-sm"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <span>Delete</span>
-                        </li>
-                      </ul>
-                    </div>
-                  )}
+                          <ChevronDownIcon className="w-6 h-6" />
+                        </label>
+                        <ul
+                          tabIndex={0}
+                          className="z-40 p-2 shadow dropdown-content menu bg-base-100 rounded-box w-52"
+                        >
+                          <li onClick={(e) => e.stopPropagation()}>
+                            <Link href={`/recipe/edit/${recipe.id}`}>Edit</Link>
+                          </li>
+                          <li
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(
+                                `https://recipes.leo-kling.dev/recipe/${recipe.id}`
+                              );
+                            }}
+                          >
+                            <span>Share</span>
+                          </li>
+                          <li
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteRecipe({
+                                id: recipe.id,
+                                authorId: recipe.authorId,
+                              });
+                              router.replace("/recipes");
+                            }}
+                          >
+                            <span>Delete</span>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <Link href={`/user/${user.id}`}>
                   <p className="link">

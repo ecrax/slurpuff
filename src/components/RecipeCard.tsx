@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { msToTimeString } from "../utils/time";
+import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/outline";
 import {
-  BookmarkIcon as BookmarkIconOutline,
+  BookmarkIcon as BookmarkIconSolid,
   ChevronDownIcon,
-} from "@heroicons/react/outline";
-import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/solid";
+} from "@heroicons/react/solid";
 import type { Recipe } from "@prisma/client";
 import type { Session } from "next-auth";
 import { useState } from "react";
@@ -17,7 +17,7 @@ const RecipeCard: React.FC<{
   savedRecipes?: number[];
   dropdown?: boolean;
 }> = ({ recipe, dropdown = false, session, savedRecipes }) => {
-  const [isSaved, setIsSaved] = useState<boolean>(
+  const [isSaved, setIsSaved] = useState(
     !!savedRecipes &&
       savedRecipes.length > 0 &&
       savedRecipes.includes(recipe.id)

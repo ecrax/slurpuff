@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import RecipeCard from "../../components/RecipeCard";
 import { trpc } from "../../utils/trpc";
 
@@ -15,15 +16,26 @@ const UserPage: NextPage = () => {
 };
 
 const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
-  const { data: user, isLoading } = trpc.useQuery([
-    "user.getUserById",
-    { id: id },
-  ]);
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = trpc.useQuery(["user.getUserById", { id: id }]);
 
   const { data: recipes, isLoading: isRecipesLoading } = trpc.useQuery([
     "user.getAllUserRecipes",
     { id: id },
   ]);
+
+  const { data: session, status } = useSession();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (error?.data?.httpStatus === 404) {
+      router.push("/404");
+    }
+  });
 
   return (
     <>
@@ -34,7 +46,11 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading && !isRecipesLoading && recipes && user ? (
+        {!isLoading &&
+        status !== "loading" &&
+        !isRecipesLoading &&
+        recipes &&
+        user ? (
           <>
             <main className="flex flex-col items-center justify-center pb-16">
               <div>
@@ -53,7 +69,14 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {recipes.map((recipe) => {
-                  return <RecipeCard key={recipe.id} recipe={recipe} />;
+                  return (
+                    <RecipeCard
+                      key={recipe.id}
+                      recipe={recipe}
+                      savedRecipes={user.savedRecipes}
+                      session={session}
+                    />
+                  );
                 })}
               </div>
             </main>

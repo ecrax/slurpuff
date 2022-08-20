@@ -68,8 +68,9 @@ export const recipeRouter = createRouter()
 
       const recipe = await ctx.prisma.recipe.findUniqueOrThrow({
         where: { id: input.id },
+        select: { authorId: true },
       });
-      if (recipe?.authorId !== ctx.session?.user?.id) {
+      if (recipe.authorId !== ctx.session?.user?.id) {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
@@ -99,8 +100,9 @@ export const recipeRouter = createRouter()
 
       const recipe = await ctx.prisma.recipe.findUniqueOrThrow({
         where: { id: input.id },
+        select: { authorId: true },
       });
-      if (recipe?.authorId !== ctx.session?.user?.id) {
+      if (recipe.authorId !== ctx.session?.user?.id) {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
