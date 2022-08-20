@@ -1,10 +1,18 @@
 import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import RecipeCard from "../components/RecipeCard";
 import { trpc } from "../utils/trpc";
 
 const Recipes: NextPage = () => {
   const { data: recipes } = trpc.useQuery(["recipe.getAll"]);
+  const { data: session, status } = useSession();
+  const { data: user, isLoading } = trpc.useQuery(
+    ["user.getUserById", { id: session?.user?.id ?? "" }],
+    {
+      enabled: !!session?.user?.id,
+    }
+  );
 
   return (
     <>
@@ -17,9 +25,16 @@ const Recipes: NextPage = () => {
       <div className="container h-screen px-8 mx-auto">
         <main className="flex flex-col items-center justify-center mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {recipes ? (
+            {recipes && !isLoading && status !== "loading" ? (
               recipes.map((recipe) => {
-                return <RecipeCard recipe={recipe} key={recipe.id} />;
+                return (
+                  <RecipeCard
+                    session={session}
+                    recipe={recipe}
+                    key={recipe.id}
+                    savedRecipes={user?.savedRecipes}
+                  />
+                );
               })
             ) : (
               <p>Loading...</p>

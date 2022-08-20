@@ -82,6 +82,8 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
                         dropdown={session?.user?.id === recipe.authorId}
                         key={recipe.id}
                         recipe={recipe}
+                        savedRecipes={user.savedRecipes}
+                        session={session}
                       />
                     );
                   })

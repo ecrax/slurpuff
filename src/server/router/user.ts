@@ -1,5 +1,6 @@
 import type { Recipe } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { isNumberObject } from "util/types";
 import { z } from "zod";
 import { createRouter } from "./context";
 
@@ -33,4 +34,59 @@ export const userRouter = createRouter()
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next();
+  })
+  .mutation("addSavedRecipe", {
+    input: z.object({
+      id: z.string().min(1),
+      recipeId: z.number().min(1),
+    }),
+    async resolve({ ctx, input }) {
+      if (ctx.session?.user?.id !== input.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      // Works, but fetching all saved recipes, when one adds a saved recipe is quite expensive
+      const { savedRecipes } = await ctx.prisma.user.findUniqueOrThrow({
+        where: { id: input.id },
+        select: { savedRecipes: true },
+      });
+
+      if (!savedRecipes.includes(input.recipeId))
+        savedRecipes.push(input.recipeId);
+
+      await ctx.prisma.user.update({
+        where: { id: input.id },
+        data: {
+          savedRecipes: savedRecipes,
+        },
+      });
+    },
+  })
+  .mutation("removeSavedRecipe", {
+    input: z.object({
+      id: z.string().min(1),
+      recipeId: z.number().min(1),
+    }),
+    async resolve({ ctx, input }) {
+      if (ctx.session?.user?.id !== input.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const { savedRecipes } = await ctx.prisma.user.findUniqueOrThrow({
+        where: { id: input.id },
+        select: { savedRecipes: true },
+      });
+
+      const i = savedRecipes.indexOf(input.recipeId, 0);
+      if (i > -1) savedRecipes.splice(i, 1);
+
+      await ctx.prisma.user.update({
+        where: { id: input.id },
+        data: {
+          savedRecipes: {
+            set: savedRecipes,
+          },
+        },
+      });
+    },
   });

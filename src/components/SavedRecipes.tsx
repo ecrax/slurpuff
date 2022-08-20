@@ -7,9 +7,7 @@ const SavedRecipes: React.FC<{
   user: User;
   session: Session;
 }> = ({ recipes, session, user }) => {
-  const savedRecipes = recipes.filter((r) => {
-    user.savedRecipes?.includes(r.id);
-  });
+  const savedRecipes = recipes.filter((r) => user.savedRecipes?.includes(r.id));
 
   if (savedRecipes.length === 0) return <div>No Recipes Saved Yet</div>;
 
@@ -21,6 +19,8 @@ const SavedRecipes: React.FC<{
             dropdown={session?.user?.id === recipe.authorId}
             key={recipe.id}
             recipe={recipe}
+            savedRecipes={user.savedRecipes}
+            session={session}
           />
         );
       })}
