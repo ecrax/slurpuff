@@ -15,6 +15,3 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 
 ## DB
 Railway Postgres
-
-## Notes
-https://tanstack.com/query/v4/docs/guides/dependent-queries

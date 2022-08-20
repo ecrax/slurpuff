@@ -39,7 +39,7 @@ const Navbar = () => {
               className="p-2 mt-3 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
             >
               <li>
-                <Link href={`/user/${session.user?.id}`}>Profile</Link>
+                <Link href={"/user/me"}>Profile</Link>
               </li>
               <li>
                 <Link href="/new">New</Link>
