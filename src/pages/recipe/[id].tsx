@@ -27,6 +27,8 @@ const RecipePage: NextPage = () => {
 };
 
 const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
+  const utils = trpc.useContext();
+
   const {
     data: recipe,
     isLoading: isRecipeLoading,
@@ -38,10 +40,19 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
     { enabled: !!recipe?.authorId }
   );
   const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
-  const { mutate: addSavedRecipe } = trpc.useMutation(["user.addSavedRecipe"]);
-  const { mutate: removeSavedRecipe } = trpc.useMutation([
+  const { mutate: addSavedRecipe } = trpc.useMutation("user.addSavedRecipe", {
+    onSuccess(data, variables, context) {
+      utils.invalidateQueries(["user.getUserById", { id: variables.id }]);
+    },
+  });
+  const { mutate: removeSavedRecipe } = trpc.useMutation(
     "user.removeSavedRecipe",
-  ]);
+    {
+      onSuccess(data, variables, context) {
+        utils.invalidateQueries(["user.getUserById", { id: variables.id }]);
+      },
+    }
+  );
 
   const { data: session, status } = useSession();
 

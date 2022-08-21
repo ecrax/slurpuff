@@ -23,8 +23,21 @@ const RecipeCard: React.FC<{
       savedRecipes.includes(recipe.id)
   );
 
-  const { mutate: addRecipe } = trpc.useMutation(["user.addSavedRecipe"]);
-  const { mutate: removeRecipe } = trpc.useMutation(["user.removeSavedRecipe"]);
+    const utils = trpc.useContext();
+
+    const { mutate: addRecipe } = trpc.useMutation("user.addSavedRecipe", {
+      onSuccess(data, variables, context) {
+        utils.invalidateQueries(["user.getUserById", { id: variables.id }]);
+      },
+    });
+    const { mutate: removeRecipe } = trpc.useMutation(
+      "user.removeSavedRecipe",
+      {
+        onSuccess(data, variables, context) {
+          utils.invalidateQueries(["user.getUserById", { id: variables.id }]);
+        },
+      }
+    );
 
   return (
     <Link href={`/recipe/${recipe.id}`}>
