@@ -29,6 +29,7 @@ const New: NextPage = () => {
   const [notes, setNotes] = useState("");
   const [image, setImage] = useState<File>();
   const [duration, setDuration] = useState({ minutes: 0, hours: 0 });
+  const [rating, setRating] = useState(4);
 
   const handleCreate = async () => {
     if (!session?.user?.id) return;
@@ -54,6 +55,7 @@ const New: NextPage = () => {
         image: uploadedImageUrl,
         timeRequired: durationMs,
         notes: notes.trim(),
+        rating: rating,
       },
       {
         onSuccess() {
@@ -96,6 +98,23 @@ const New: NextPage = () => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
+                    </label>
+                  </div>
+                  <div className="py-2">
+                    <label>
+                      <h3>Rating</h3>
+                      <div className="rating">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <input
+                            type="radio"
+                            name="rating-9"
+                            key={`${i}_rating`}
+                            className="mask mask-star-2 bg-primary"
+                            checked={rating === i + 1}
+                            onChange={() => setRating(i + 1)}
+                          />
+                        ))}
+                      </div>
                     </label>
                   </div>
                   <div className="py-2">

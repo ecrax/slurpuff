@@ -90,6 +90,7 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
   const [name, setName] = useState(oldRecipe.name);
   const [notes, setNotes] = useState(oldRecipe.notes);
   const [image, setImage] = useState<File>();
+  const [rating, setRating] = useState(oldRecipe.rating);
   const [duration, setDuration] = useState({
     minutes: timeRequired.mins,
     hours: timeRequired.hrs,
@@ -127,6 +128,7 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
         timeRequired:
           durationMs === oldRecipe.timeRequired ? undefined : durationMs,
         notes: notes === oldRecipe.notes ? undefined : notes?.trim(),
+        rating: rating === oldRecipe.rating ? undefined : rating,
       },
       {
         onSuccess() {
@@ -163,6 +165,23 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
+                </label>
+              </div>
+              <div className="py-2">
+                <label>
+                  <h3>Rating</h3>
+                  <div className="rating">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <input
+                        type="radio"
+                        name="rating-9"
+                        key={`${i}_rating`}
+                        className="mask mask-star-2 bg-primary"
+                        checked={rating === i + 1}
+                        onChange={() => setRating(i + 1)}
+                      />
+                    ))}
+                  </div>
                 </label>
               </div>
               <div className="py-2">

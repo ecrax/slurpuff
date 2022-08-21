@@ -196,6 +196,19 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                   ))}
                 </div>
 
+                <div className="pt-4 rating">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      className="mask mask-star-2 bg-primary"
+                      checked={recipe.rating === i + 1}
+                      readOnly
+                      key={`${i}_rating`}
+                    />
+                  ))}
+                </div>
+
                 <div className="pt-8">
                   <i>~ {recipe.notes}</i>
                 </div>

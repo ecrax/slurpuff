@@ -42,6 +42,7 @@ export const recipeRouter = createRouter()
       authorId: z.string(),
       tags: z.array(z.string()),
       notes: z.string().nullish(),
+      rating: z.number(),
     }),
     resolve: async ({ input, ctx }) => {
       await ctx.prisma.recipe.create({
@@ -60,6 +61,7 @@ export const recipeRouter = createRouter()
       timeRequired: z.number().nullish(),
       tags: z.array(z.string()).nullish(),
       notes: z.string().nullish(),
+      rating: z.number().nullish(),
     }),
     resolve: async ({ input, ctx }) => {
       if (ctx.session?.user?.id !== input.authorId) {
@@ -87,6 +89,7 @@ export const recipeRouter = createRouter()
           timeRequired: input.timeRequired ?? undefined,
           tags: input.tags ?? undefined,
           notes: input.notes ?? undefined,
+          rating: input.rating ?? undefined,
         },
       });
     },
@@ -105,7 +108,6 @@ export const recipeRouter = createRouter()
       if (recipe.authorId !== ctx.session?.user?.id) {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
-
 
       await ctx.prisma.recipe.delete({
         where: {
