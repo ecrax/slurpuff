@@ -44,7 +44,7 @@ const RecipeCard: React.FC<{
       <Link href={`/recipe/${recipe.id}`}>
         <div className="border-2 rounded-md cursor-pointer border-primary">
           <Image
-            width={340}
+            width={445}
             height={220}
             src={recipe.image}
             alt={recipe.name}

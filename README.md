@@ -9,6 +9,7 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] Profile Page (view saved recipes)
 - [x] Rate recipes (only an initial star rating)
 - [ ] search
+- [ ] Pagination for all pages where multiple recipes are displayed
 - [ ] start displaying recipes by name and not by id in the url
 - [ ] eventually switch to planetscale
 - [ ] proper form checking and error feedback
