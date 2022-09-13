@@ -61,11 +61,7 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
                 />
               </div>
               <div>
-                <h1 className="py-8 mb-2 text-4xl font-bold">
-                  {!(user.firstName && user.lastName)
-                    ? user.name
-                    : user.firstName + " " + user.lastName}
-                </h1>
+                <h1 className="py-8 mb-2 text-4xl font-bold">{user.name}</h1>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {recipes.map((recipe) => {
