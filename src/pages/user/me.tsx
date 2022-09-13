@@ -35,7 +35,8 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
 
   useEffect(() => {
     if (!x && user?.savedRecipes) setX(user.savedRecipes);
-  }, [user?.savedRecipes]);
+    if (!session) setX([]);
+  }, [user?.savedRecipes, session]);
 
   return (
     <>
