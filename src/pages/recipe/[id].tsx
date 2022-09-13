@@ -3,6 +3,7 @@ import {
   BookmarkIcon as BookmarkIconSolid,
   ChevronDownIcon,
 } from "@heroicons/react/solid";
+import { useAtom } from "jotai";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
@@ -10,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { savedRecipesAtom } from "../../utils/atoms";
 import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
 
@@ -27,8 +29,6 @@ const RecipePage: NextPage = () => {
 };
 
 const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
-  const utils = trpc.useContext();
-
   const {
     data: recipe,
     isLoading: isRecipeLoading,
@@ -40,27 +40,14 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
     { enabled: !!recipe?.authorId }
   );
   const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
-  const { mutate: addSavedRecipe } = trpc.useMutation("user.addSavedRecipe", {
-    onSuccess(data, variables, context) {
-      utils.invalidateQueries(["user.getUserById", { id: variables.id }]);
-    },
-  });
+  const { mutate: addSavedRecipe } = trpc.useMutation("user.addSavedRecipe");
   const { mutate: removeSavedRecipe } = trpc.useMutation(
-    "user.removeSavedRecipe",
-    {
-      onSuccess(data, variables, context) {
-        utils.invalidateQueries(["user.getUserById", { id: variables.id }]);
-      },
-    }
+    "user.removeSavedRecipe"
   );
 
   const { data: session, status } = useSession();
 
-  const [isSaved, setIsSaved] = useState(
-    !!user?.savedRecipes &&
-      user?.savedRecipes.length > 0 &&
-      user?.savedRecipes.includes(recipe?.id!)
-  );
+  const [x, setX] = useAtom(savedRecipesAtom);
 
   const router = useRouter();
 
@@ -105,23 +92,27 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                         className="ml-4 btn btn-ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (!isSaved) {
+                          if (!x.includes(recipe.id)) {
                             //add to saved recipes
                             addSavedRecipe({
                               id: session.user?.id!,
                               recipeId: recipe.id,
                             });
+                            setX([...x, recipe.id]);
                           } else {
                             //remove from saved recipes
                             removeSavedRecipe({
                               id: session.user?.id!,
                               recipeId: recipe.id,
                             });
+                            const d = [...x];
+                            const i = d.indexOf(recipe.id, 0);
+                            if (i > -1) d.splice(i, 1);
+                            setX(d);
                           }
-                          setIsSaved(!isSaved);
                         }}
                       >
-                        {isSaved ? (
+                        {x.includes(recipe.id) ? (
                           <BookmarkIconSolid className="w-4 h-4" />
                         ) : (
                           <BookmarkIconOutline className="w-4 h-4" />
@@ -242,6 +233,6 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </div>
     </>
   );
-};
+};;
 
 export default RecipePage;

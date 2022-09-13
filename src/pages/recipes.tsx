@@ -2,9 +2,13 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import RecipeCard from "../components/RecipeCard";
+import { savedRecipesAtom } from "../utils/atoms";
 import { trpc } from "../utils/trpc";
+import { useAtom } from "jotai";
+import { useEffect } from "react";
 
 const Recipes: NextPage = () => {
+  const [x, setX] = useAtom(savedRecipesAtom);
   const { data: recipes } = trpc.useQuery(["recipe.getAll"]);
   const { data: session, status } = useSession();
   const { data: user, isLoading } = trpc.useQuery(
@@ -13,6 +17,10 @@ const Recipes: NextPage = () => {
       enabled: !!session?.user?.id,
     }
   );
+
+  useEffect(() => {
+    if (x.length === 0 && user?.savedRecipes) setX(user.savedRecipes);
+  }, [setX, user?.savedRecipes, x.length]);
 
   return (
     <>
@@ -32,7 +40,6 @@ const Recipes: NextPage = () => {
                     session={session}
                     recipe={recipe}
                     key={recipe.id}
-                    savedRecipes={user?.savedRecipes}
                   />
                 );
               })
