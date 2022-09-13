@@ -171,12 +171,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                   </div>
                 </div>
                 <Link href={`/user/${user.id}`}>
-                  <p className="link">
-                    by{" "}
-                    {!(user.firstName && user.lastName)
-                      ? user.name
-                      : user.firstName + " " + user.lastName}
-                  </p>
+                  <p className="link">by {user.name}</p>
                 </Link>
                 <div className="space-x-2">
                   <span className="badge badge-primary">

@@ -60,11 +60,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
                 />
               </div>
               <div>
-                <h1 className="py-8 mb-2 text-4xl font-bold">
-                  {!(user.firstName && user.lastName)
-                    ? user.name
-                    : user.firstName + " " + user.lastName}
-                </h1>
+                <h1 className="py-8 mb-2 text-4xl font-bold">{user.name}</h1>
               </div>
               <div className="pb-4 tabs">
                 <a
