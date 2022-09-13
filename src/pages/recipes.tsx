@@ -33,7 +33,7 @@ const Recipes: NextPage = () => {
       <div className="container h-screen px-8 mx-auto">
         <main className="flex flex-col items-center justify-center mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {recipes && !isLoading && status !== "loading" ? (
+            {recipes && x && !isLoading && status !== "loading" ? (
               recipes.map((recipe) => {
                 return (
                   <RecipeCard

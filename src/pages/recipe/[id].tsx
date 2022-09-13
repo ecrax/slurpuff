@@ -73,6 +73,7 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
         {!isLoading &&
         !isRecipeLoading &&
         status !== "loading" &&
+        x &&
         recipe &&
         user ? (
           <>

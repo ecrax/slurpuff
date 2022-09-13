@@ -46,7 +46,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading && !isRecipesLoading && recipes && user ? (
+        {!isLoading && x && !isRecipesLoading && recipes && user ? (
           <>
             <main className="flex flex-col items-center justify-center pb-16">
               <div>
