@@ -45,21 +45,21 @@ export const userRouter = createRouter()
       }
 
       // Works, but fetching all saved recipes, when one adds a saved recipe is quite expensive
-      //const { savedRecipes } = await ctx.prisma.user.findUniqueOrThrow({
-      //  where: { id: input.id },
-      //  select: { savedRecipes: true },
-      //});
-      //
-      //if (!savedRecipes.includes(input.recipeId))
-      //  savedRecipes.push(input.recipeId);
+      const { savedRecipes } = await ctx.prisma.user.findUniqueOrThrow({
+        where: { id: input.id },
+        select: { savedRecipes: true },
+      });
+
+      if (!savedRecipes.includes(input.recipeId))
+        savedRecipes.push(input.recipeId);
 
       await ctx.prisma.user.update({
         where: { id: input.id },
         data: {
-          //savedRecipes: savedRecipes,
-          savedRecipes: {
-            push: input.recipeId,
-          },
+          savedRecipes: savedRecipes,
+          //savedRecipes: {
+          //  push: input.recipeId,
+          //},
         },
       });
     },
