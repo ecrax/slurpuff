@@ -3,9 +3,11 @@ import type { Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import RecipeCard from "../../components/RecipeCard";
+import { savedRecipesAtom } from "../../utils/atoms";
 import { trpc } from "../../utils/trpc";
+import { useAtom } from "jotai";
 
 const MePage: NextPage = () => {
   const { data: session, status } = useSession();
@@ -18,6 +20,7 @@ const MePage: NextPage = () => {
 };
 
 const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
+  const [x, setX] = useAtom(savedRecipesAtom);
   const { data: user, isLoading } = trpc.useQuery([
     "user.getUserById",
     { id: session.user!.id! },
@@ -29,6 +32,10 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
   ]);
 
   const [currentTab, setCurrentTab] = useState<"all" | "saved">("all");
+
+  useEffect(() => {
+    if (x.length === 0 && user?.savedRecipes) setX(user.savedRecipes);
+  }, [setX, user?.savedRecipes, x.length]);
 
   return (
     <>
@@ -82,7 +89,6 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
                         dropdown={session?.user?.id === recipe.authorId}
                         key={recipe.id}
                         recipe={recipe}
-                        savedRecipes={user.savedRecipes}
                         session={session}
                       />
                     );

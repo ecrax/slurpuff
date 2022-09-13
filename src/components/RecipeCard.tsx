@@ -28,7 +28,7 @@ const RecipeCard: React.FC<{
       <div className="border-2 rounded-md cursor-pointer border-primary">
         <Image
           width={445}
-          height={220}
+          height={300}
           src={recipe.image}
           alt={recipe.name}
           className="rounded"

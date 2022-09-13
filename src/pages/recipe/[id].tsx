@@ -82,8 +82,8 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
               />
             </div>
 
-            <main className="flex flex-col items-center justify-center pb-16 prose">
-              <div>
+            <main className="flex flex-col items-center justify-center w-full pb-16 prose max-w-none ">
+              <div className="w-full">
                 <div className="flex flex-row items-baseline">
                   <h1 className="pt-8 mb-2">{recipe.name}</h1>{" "}
                   <div className="flex items-center">
@@ -204,25 +204,27 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                   <i>~ {recipe.notes}</i>
                 </div>
 
-                <div className="mt-8">
-                  <h2>Ingredients</h2>
-                  {recipe.ingredients.map((ingr) => (
-                    <div key={ingr}>
-                      <span className="font-bold">
-                        {ingr.substring(0, ingr.indexOf(" "))}
-                      </span>{" "}
-                      <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <h2>Steps</h2>
-                  {recipe.steps.map((s, i) => (
-                    <div key={s}>
-                      <span className="font-bold">{i + 1}.</span>
-                      {" " + s}
-                    </div>
-                  ))}
+                <div className="grid grid-cols-3 gap-8 w-full mt-8">
+                  <div>
+                    <h2>Ingredients</h2>
+                    {recipe.ingredients.map((ingr) => (
+                      <div key={ingr}>
+                        <span className="font-bold">
+                          {ingr.substring(0, ingr.indexOf(" "))}
+                        </span>{" "}
+                        <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="col-span-2">
+                    <h2>Steps</h2>
+                    {recipe.steps.map((s, i) => (
+                      <div key={s}>
+                        <span className="font-bold">{i + 1}.</span>
+                        {" " + s}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </main>
