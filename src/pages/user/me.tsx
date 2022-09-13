@@ -36,6 +36,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
   useEffect(() => {
     if (!x && user?.savedRecipes) setX(user.savedRecipes);
     if (!session) setX([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.savedRecipes, session]);
 
   return (
@@ -51,6 +52,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
           <>
             <main className="flex flex-col items-center justify-center pb-16">
               <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={user.image ?? ""}
                   alt={user.name ?? "Avatar of user"}

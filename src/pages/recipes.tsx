@@ -21,6 +21,7 @@ const Recipes: NextPage = () => {
   useEffect(() => {
     if (!x && user?.savedRecipes) setX(user.savedRecipes);
     if (!session) setX([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.savedRecipes, session]);
 
 
