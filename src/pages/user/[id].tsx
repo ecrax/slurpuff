@@ -73,7 +73,6 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
                     <RecipeCard
                       key={recipe.id}
                       recipe={recipe}
-                      savedRecipes={user.savedRecipes}
                       session={session}
                     />
                   );
