@@ -9,13 +9,13 @@ const SavedRecipes: React.FC<{
   user: User;
   session: Session;
 }> = ({ recipes, session, user }) => {
-  const [x, setX] = useAtom(savedRecipesAtom);
-  const savedRecipes = recipes.filter((r) => x.includes(r.id));
+  const [x] = useAtom(savedRecipesAtom);
+  const savedRecipes = recipes.filter((r) => x!.includes(r.id));
 
   if (savedRecipes.length === 0) return <div>No Recipes Saved Yet</div>;
 
   return (
-    <div>
+    <>
       {savedRecipes.map((recipe) => {
         return (
           <RecipeCard
@@ -26,7 +26,7 @@ const SavedRecipes: React.FC<{
           />
         );
       })}
-    </div>
+    </>
   );
 };
 

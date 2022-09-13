@@ -39,21 +39,30 @@ export const recipeRouter = createRouter()
       ingredients: z.array(z.string()),
       steps: z.array(z.string()),
       timeRequired: z.number(),
-      authorId: z.string(),
+      //authorId: z.string(),
       tags: z.array(z.string()),
       notes: z.string().nullish(),
       rating: z.number(),
     }),
     resolve: async ({ input, ctx }) => {
       await ctx.prisma.recipe.create({
-        data: input,
+        data: {
+          name: input.name,
+          image: input.image,
+          ingredients: input.ingredients,
+          steps: input.steps,
+          timeRequired: input.timeRequired,
+          tags: input.tags,
+          notes: input.notes,
+          rating: input.rating,
+          authorId: ctx.session?.user?.id!,
+        },
       });
     },
   })
   .mutation("update", {
     input: z.object({
       id: z.number(),
-      authorId: z.string(),
       name: z.string().nullish(),
       image: z.string().nullish(),
       ingredients: z.array(z.string()).nullish(),
@@ -64,10 +73,6 @@ export const recipeRouter = createRouter()
       rating: z.number().nullish(),
     }),
     resolve: async ({ input, ctx }) => {
-      if (ctx.session?.user?.id !== input.authorId) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
       const recipe = await ctx.prisma.recipe.findUniqueOrThrow({
         where: { id: input.id },
         select: { authorId: true },

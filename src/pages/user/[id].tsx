@@ -32,7 +32,7 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (error?.data?.httpStatus === 404) {
+    if (error?.data?.httpStatus === 404 || (!isLoading && !user)) {
       router.push("/404");
     }
   });

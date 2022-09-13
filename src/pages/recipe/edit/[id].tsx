@@ -113,7 +113,6 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
     updateRecipe(
       {
         id: oldRecipe.id,
-        authorId: oldRecipe.authorId,
         name: name === oldRecipe.name ? undefined : name.trim(),
         ingredients: arrayIsEqual(ingredients, oldRecipe.ingredients)
           ? undefined

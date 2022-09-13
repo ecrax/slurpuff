@@ -34,8 +34,8 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
   const [currentTab, setCurrentTab] = useState<"all" | "saved">("all");
 
   useEffect(() => {
-    if (x.length === 0 && user?.savedRecipes) setX(user.savedRecipes);
-  }, [setX, user?.savedRecipes, x.length]);
+    if (!x && user?.savedRecipes) setX(user.savedRecipes);
+  }, [user?.savedRecipes]);
 
   return (
     <>

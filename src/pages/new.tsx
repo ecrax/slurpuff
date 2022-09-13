@@ -47,7 +47,6 @@ const New: NextPage = () => {
 
     createRecipe(
       {
-        authorId: session?.user?.id,
         name: name.trim(),
         ingredients: ingredients.map((v) => v.trim()),
         steps: steps.map((v) => v.trim()),

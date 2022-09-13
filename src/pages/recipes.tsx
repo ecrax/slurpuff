@@ -19,8 +19,8 @@ const Recipes: NextPage = () => {
   );
 
   useEffect(() => {
-    if (x.length === 0 && user?.savedRecipes) setX(user.savedRecipes);
-  }, [setX, user?.savedRecipes, x.length]);
+    if (!x && user?.savedRecipes) setX(user.savedRecipes);
+  }, [user?.savedRecipes]);
 
   return (
     <>

@@ -10,7 +10,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { savedRecipesAtom } from "../../utils/atoms";
 import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
@@ -48,6 +48,10 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
   const { data: session, status } = useSession();
 
   const [x, setX] = useAtom(savedRecipesAtom);
+
+  useEffect(() => {
+    if (!x && user?.savedRecipes) setX(user.savedRecipes);
+  }, [user?.savedRecipes]);
 
   const router = useRouter();
 
@@ -92,27 +96,27 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
                         className="ml-4 btn btn-ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (!x.includes(recipe.id)) {
+                          if (!x!.includes(recipe.id)) {
                             //add to saved recipes
                             addSavedRecipe({
                               id: session.user?.id!,
                               recipeId: recipe.id,
                             });
-                            setX([...x, recipe.id]);
+                            setX([...x!, recipe.id]);
                           } else {
                             //remove from saved recipes
                             removeSavedRecipe({
                               id: session.user?.id!,
                               recipeId: recipe.id,
                             });
-                            const d = [...x];
+                            const d = [...x!];
                             const i = d.indexOf(recipe.id, 0);
                             if (i > -1) d.splice(i, 1);
                             setX(d);
                           }
                         }}
                       >
-                        {x.includes(recipe.id) ? (
+                        {x!.includes(recipe.id) ? (
                           <BookmarkIconSolid className="w-4 h-4" />
                         ) : (
                           <BookmarkIconOutline className="w-4 h-4" />
