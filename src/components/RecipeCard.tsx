@@ -199,6 +199,10 @@ const CardTabs: React.FC<{ recipe: Recipe }> = ({ recipe }) => (
             type="radio"
             name={`${i}_rating`}
             className="mask mask-star-2 bg-primary"
+            style={{
+              transform: "none",
+              animation: "none",
+            }}
             checked={recipe.rating === i + 1}
             readOnly
             key={`${i}_rating_${recipe.id}`}

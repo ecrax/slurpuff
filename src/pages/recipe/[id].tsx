@@ -276,6 +276,10 @@ const RecipePageContent: React.FC<{
           type="radio"
           name="rating-9"
           className="mask mask-star-2 bg-primary"
+          style={{
+            transform: "none",
+            animation: "none",
+          }}
           checked={recipe.rating === i + 1}
           readOnly
           key={`${i}_rating`}
