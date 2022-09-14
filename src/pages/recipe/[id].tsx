@@ -5,6 +5,7 @@ import {
 } from "@heroicons/react/solid";
 import { useAtom } from "jotai";
 import type { NextPage } from "next";
+import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
@@ -17,18 +18,22 @@ import { trpc } from "../../utils/trpc";
 
 const RecipePage: NextPage = () => {
   const { query } = useRouter();
+  const { data: session, status } = useSession();
 
   const { id } = query;
 
   if (!id || typeof id !== "string") return <div>No id</div>;
 
   const _id = Number.parseInt(id);
-  if (Number.isNaN(_id)) return <p>Please pass a number</p>;
+  if (Number.isNaN(_id)) return <div>Please pass a number</div>;
 
-  return <RecipePageContent id={_id} />;
+  if (status === "loading") return <div>Loading...</div>;
+
+  if (session) return <RecipePageContentLoggedIn session={session} id={_id} />;
+  else return <RecipePageContentAnon id={_id} />;
 };
 
-const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
+const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
   const {
     data: recipe,
     isLoading: isRecipeLoading,
@@ -36,25 +41,9 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
   } = trpc.useQuery(["recipe.getById", { id: id }]);
 
   const { data: user, isLoading: isLoading } = trpc.useQuery(
-    ["user.getUserById", { id: recipe?.authorId! }],
+    ["user.getUserDataById", { id: recipe?.authorId! }],
     { enabled: !!recipe?.authorId }
   );
-  const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
-  const { mutate: addSavedRecipe } = trpc.useMutation("user.addSavedRecipe");
-  const { mutate: removeSavedRecipe } = trpc.useMutation(
-    "user.removeSavedRecipe"
-  );
-
-  const { data: session, status } = useSession();
-
-  const [x, setX] = useAtom(savedRecipesAtom);
-
-  useEffect(() => {
-    if (!x && user?.savedRecipes) setX(user.savedRecipes);
-    if (!session) setX([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.savedRecipes, session]);
-
 
   const router = useRouter();
 
@@ -73,12 +62,136 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading &&
-        !isRecipeLoading &&
-        status !== "loading" &&
-        x &&
-        recipe &&
-        user ? (
+        {!isRecipeLoading && user && recipe ? (
+          <>
+            <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
+              <Image
+                src={recipe.image ?? ""}
+                alt={recipe.name}
+                objectFit="cover"
+                layout="fill"
+                priority
+              />
+            </div>
+
+            <main className="flex flex-col items-center justify-center w-full pb-16 prose max-w-none ">
+              <div className="w-full">
+                <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                <Link href={`/user/${user.id}`}>
+                  <p className="link">by {user.name}</p>
+                </Link>
+                <div className="space-x-2">
+                  <span className="badge badge-primary">
+                    {recipe.steps.length} Step
+                    {recipe.steps.length > 1 ? "s" : ""}
+                  </span>
+
+                  <span className="badge badge-primary">
+                    {msToTimeString(recipe.timeRequired)}
+                  </span>
+
+                  {recipe.tags.map((t) => (
+                    <span className="badge badge-ghost" key={t}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="pt-4 rating">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      className="mask mask-star-2 bg-primary"
+                      checked={recipe.rating === i + 1}
+                      readOnly
+                      key={`${i}_rating`}
+                    />
+                  ))}
+                </div>
+
+                <div className="pt-8">
+                  <i>~ {recipe.notes}</i>
+                </div>
+
+                <div className="grid grid-cols-3 gap-8 w-full mt-8">
+                  <div>
+                    <h2>Ingredients</h2>
+                    {recipe.ingredients.map((ingr) => (
+                      <div key={ingr}>
+                        <span className="font-bold">
+                          {ingr.substring(0, ingr.indexOf(" "))}
+                        </span>{" "}
+                        <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="col-span-2">
+                    <h2>Steps</h2>
+                    {recipe.steps.map((s, i) => (
+                      <div key={s}>
+                        <span className="font-bold">{i + 1}.</span>
+                        {" " + s}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </main>
+          </>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
+    </>
+  );
+};
+
+const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
+  id,
+  session,
+}) => {
+  const {
+    data: recipe,
+    isLoading: isRecipeLoading,
+    error,
+  } = trpc.useQuery(["recipe.getById", { id: id }]);
+
+  const { data: user, isLoading: isLoading } = trpc.useQuery(
+    ["user.getCurrentUser"],
+    { enabled: !!recipe?.authorId }
+  );
+  const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
+  const { mutate: addSavedRecipe } = trpc.useMutation("user.addSavedRecipe");
+  const { mutate: removeSavedRecipe } = trpc.useMutation(
+    "user.removeSavedRecipe"
+  );
+
+  const [x, setX] = useAtom(savedRecipesAtom);
+
+  useEffect(() => {
+    if (!x && user?.savedRecipes) setX(user.savedRecipes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.savedRecipes, session]);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (error?.data?.httpStatus === 404) {
+      router.push("/404");
+    }
+  });
+
+  return (
+    <>
+      <Head>
+        <title>Create T3 App</title>
+        <meta name="description" content="Generated by create-t3-app" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <div className="container h-screen px-8 mx-auto">
+        {!isLoading && !isRecipeLoading && x && recipe && user ? (
           <>
             <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
               <Image
@@ -238,6 +351,6 @@ const RecipePageContent: React.FC<{ id: number }> = ({ id }) => {
       </div>
     </>
   );
-};;
+};
 
 export default RecipePage;

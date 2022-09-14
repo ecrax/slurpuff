@@ -19,7 +19,7 @@ const SavedRecipes: React.FC<{
       {savedRecipes.map((recipe) => {
         return (
           <RecipeCard
-            dropdown={session?.user?.id === recipe.authorId}
+            dropdown={session.user?.id === recipe.authorId}
             key={recipe.id}
             recipe={recipe}
             session={session}

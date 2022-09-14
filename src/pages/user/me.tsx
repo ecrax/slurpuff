@@ -21,10 +21,7 @@ const MePage: NextPage = () => {
 
 const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
   const [x, setX] = useAtom(savedRecipesAtom);
-  const { data: user, isLoading } = trpc.useQuery([
-    "user.getUserById",
-    { id: session.user!.id! },
-  ]);
+  const { data: user, isLoading } = trpc.useQuery(["user.getCurrentUser"]);
 
   const { data: recipes, isLoading: isRecipesLoading } = trpc.useQuery([
     "user.getAllUserRecipes",
@@ -85,7 +82,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
                   recipes.map((recipe) => {
                     return (
                       <RecipeCard
-                        dropdown={session?.user?.id === recipe.authorId}
+                        dropdown={session.user?.id === recipe.authorId}
                         key={recipe.id}
                         recipe={recipe}
                         session={session}

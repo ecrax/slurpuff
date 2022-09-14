@@ -97,7 +97,7 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
   });
 
   const handleUpdate = async () => {
-    if (!session?.user?.id) return;
+    if (!session.user?.id) return;
 
     let uploadedImageUrl: string | undefined;
     if (image) {

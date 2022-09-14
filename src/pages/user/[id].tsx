@@ -20,7 +20,7 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
     data: user,
     isLoading,
     error,
-  } = trpc.useQuery(["user.getUserById", { id: id }]);
+  } = trpc.useQuery(["user.getUserDataById", { id: id }]);
 
   const { data: recipes, isLoading: isRecipesLoading } = trpc.useQuery([
     "user.getAllUserRecipes",

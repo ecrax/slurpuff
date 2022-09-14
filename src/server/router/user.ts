@@ -4,13 +4,32 @@ import { z } from "zod";
 import { createRouter } from "./context";
 
 export const userRouter = createRouter()
-  .query("getUserById", {
+  .query("getUserDataById", {
     input: z.object({
       id: z.string().min(1),
     }),
     async resolve({ ctx, input }) {
       const user = await ctx.prisma.user.findUnique({
         where: { id: input.id },
+        select: {
+          image: true,
+          id: true,
+          name: true,
+        },
+      });
+      return user;
+    },
+  })
+  .query("getUserRecipesById", {
+    input: z.object({
+      id: z.string().min(1),
+    }),
+    async resolve({ ctx, input }) {
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: input.id },
+        select: {
+          recipes: true,
+        },
       });
       return user;
     },
@@ -33,6 +52,14 @@ export const userRouter = createRouter()
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next();
+  })
+  .query("getCurrentUser", {
+    async resolve({ ctx }) {
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: ctx.session?.user?.id },
+      });
+      return user;
+    },
   })
   .mutation("addSavedRecipe", {
     input: z.object({
