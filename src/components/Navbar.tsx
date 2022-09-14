@@ -13,7 +13,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="container px-8 pt-8 mx-auto navbar">
+      <nav className="container p-8 mx-auto navbar">
         <div className="flex-1">
           <div className="text-xl normal-case btn btn-ghost">
             <Link href="/recipes">recipes</Link>

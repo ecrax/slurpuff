@@ -30,11 +30,10 @@ const RecipePage: NextPage = () => {
   if (Number.isNaN(_id)) return <div>Please pass a number</div>;
 
   if (status === "loading") return <LoadingSpinner />;
-  // if (status === "loading") return <></>;
 
   if (session) return <RecipePageContentLoggedIn session={session} id={_id} />;
   else return <RecipePageContentAnon id={_id} />;
-};;
+};
 
 const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
   const {
@@ -67,7 +66,7 @@ const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
       <div className="container h-screen px-8 mx-auto">
         {!isRecipeLoading && user && recipe ? (
           <>
-            <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
+            <div className="h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
               <Image
                 src={recipe.image ?? ""}
                 alt={recipe.name}
@@ -141,7 +140,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
       <div className="container h-screen px-8 mx-auto">
         {!isLoading && !isRecipeLoading && x && recipe && user ? (
           <>
-            <div className="mt-8 h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
+            <div className="h-64 md:h-72 lg:h-96 left-[50%] -ml-[50vw] -mr-[50vw] max-w-[100vw] relative right-[50%] w-screen">
               <Image
                 src={recipe.image ?? ""}
                 alt={recipe.name}
@@ -153,9 +152,9 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
 
             <main className="flex flex-col items-center justify-center w-full pb-16 prose max-w-none ">
               <div className="w-full">
-                <div className="flex flex-row items-baseline">
+                <div className="flex flex-row justify-between md:justify-start items-baseline">
                   <h1 className="pt-8 mb-2">{recipe.name}</h1>{" "}
-                  <div className="flex items-center">
+                  <div className="flex flex-col md:flex-row items-center">
                     {session && (
                       <div
                         className="ml-4 btn btn-ghost"
@@ -254,18 +253,18 @@ const RecipePageContent: React.FC<{
     <Link href={`/user/${user.id}`}>
       <p className="link">by {user.name}</p>
     </Link>
-    <div className="space-x-2">
-      <span className="badge badge-primary">
+    <div className="">
+      <span className="badge badge-primary mr-2">
         {recipe.steps.length} Step
         {recipe.steps.length > 1 ? "s" : ""}
       </span>
 
-      <span className="badge badge-primary">
+      <span className="badge badge-primary mr-2">
         {msToTimeString(recipe.timeRequired)}
       </span>
 
       {recipe.tags.map((t) => (
-        <span className="badge badge-ghost" key={t}>
+        <span className="badge badge-ghost mr-2" key={t}>
           {t}
         </span>
       ))}
