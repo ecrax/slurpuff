@@ -3,6 +3,7 @@ import {
   BookmarkIcon as BookmarkIconSolid,
   ChevronDownIcon,
 } from "@heroicons/react/solid";
+import type { Recipe, User } from "@prisma/client";
 import { useAtom } from "jotai";
 import type { NextPage } from "next";
 import { type Session } from "next-auth";
@@ -77,65 +78,10 @@ const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
             <main className="flex flex-col items-center justify-center w-full pb-16 prose max-w-none ">
               <div className="w-full">
                 <h1 className="pt-8 mb-2">{recipe.name}</h1>
-                <Link href={`/user/${user.id}`}>
-                  <p className="link">by {user.name}</p>
-                </Link>
-                <div className="space-x-2">
-                  <span className="badge badge-primary">
-                    {recipe.steps.length} Step
-                    {recipe.steps.length > 1 ? "s" : ""}
-                  </span>
-
-                  <span className="badge badge-primary">
-                    {msToTimeString(recipe.timeRequired)}
-                  </span>
-
-                  {recipe.tags.map((t) => (
-                    <span className="badge badge-ghost" key={t}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="pt-4 rating">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <input
-                      type="radio"
-                      name="rating-9"
-                      className="mask mask-star-2 bg-primary"
-                      checked={recipe.rating === i + 1}
-                      readOnly
-                      key={`${i}_rating`}
-                    />
-                  ))}
-                </div>
-
-                <div className="pt-8">
-                  <i>~ {recipe.notes}</i>
-                </div>
-
-                <div className="grid grid-cols-3 gap-8 w-full mt-8">
-                  <div>
-                    <h2>Ingredients</h2>
-                    {recipe.ingredients.map((ingr) => (
-                      <div key={ingr}>
-                        <span className="font-bold">
-                          {ingr.substring(0, ingr.indexOf(" "))}
-                        </span>{" "}
-                        <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="col-span-2">
-                    <h2>Steps</h2>
-                    {recipe.steps.map((s, i) => (
-                      <div key={s}>
-                        <span className="font-bold">{i + 1}.</span>
-                        {" " + s}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <RecipePageContent
+                  recipe={recipe}
+                  user={{ id: user.id, name: user.name ?? "" }}
+                />
               </div>
             </main>
           </>
@@ -283,65 +229,10 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                     )}
                   </div>
                 </div>
-                <Link href={`/user/${user.id}`}>
-                  <p className="link">by {user.name}</p>
-                </Link>
-                <div className="space-x-2">
-                  <span className="badge badge-primary">
-                    {recipe.steps.length} Step
-                    {recipe.steps.length > 1 ? "s" : ""}
-                  </span>
-
-                  <span className="badge badge-primary">
-                    {msToTimeString(recipe.timeRequired)}
-                  </span>
-
-                  {recipe.tags.map((t) => (
-                    <span className="badge badge-ghost" key={t}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="pt-4 rating">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <input
-                      type="radio"
-                      name="rating-9"
-                      className="mask mask-star-2 bg-primary"
-                      checked={recipe.rating === i + 1}
-                      readOnly
-                      key={`${i}_rating`}
-                    />
-                  ))}
-                </div>
-
-                <div className="pt-8">
-                  <i>~ {recipe.notes}</i>
-                </div>
-
-                <div className="grid grid-cols-3 gap-8 w-full mt-8">
-                  <div>
-                    <h2>Ingredients</h2>
-                    {recipe.ingredients.map((ingr) => (
-                      <div key={ingr}>
-                        <span className="font-bold">
-                          {ingr.substring(0, ingr.indexOf(" "))}
-                        </span>{" "}
-                        <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="col-span-2">
-                    <h2>Steps</h2>
-                    {recipe.steps.map((s, i) => (
-                      <div key={s}>
-                        <span className="font-bold">{i + 1}.</span>
-                        {" " + s}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <RecipePageContent
+                  user={{ id: user.id, name: user.name ?? "" }}
+                  recipe={recipe}
+                />
               </div>
             </main>
           </>
@@ -352,5 +243,72 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
     </>
   );
 };
+
+const RecipePageContent: React.FC<{
+  user: { id: string; name: string };
+  recipe: Recipe;
+}> = ({ recipe, user }) => (
+  <>
+    <Link href={`/user/${user.id}`}>
+      <p className="link">by {user.name}</p>
+    </Link>
+    <div className="space-x-2">
+      <span className="badge badge-primary">
+        {recipe.steps.length} Step
+        {recipe.steps.length > 1 ? "s" : ""}
+      </span>
+
+      <span className="badge badge-primary">
+        {msToTimeString(recipe.timeRequired)}
+      </span>
+
+      {recipe.tags.map((t) => (
+        <span className="badge badge-ghost" key={t}>
+          {t}
+        </span>
+      ))}
+    </div>
+
+    <div className="pt-4 rating">
+      {Array.from({ length: 5 }, (_, i) => (
+        <input
+          type="radio"
+          name="rating-9"
+          className="mask mask-star-2 bg-primary"
+          checked={recipe.rating === i + 1}
+          readOnly
+          key={`${i}_rating`}
+        />
+      ))}
+    </div>
+
+    <div className="pt-8">
+      <i>~ {recipe.notes}</i>
+    </div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full mt-8">
+      <div>
+        <h2>Ingredients</h2>
+        {recipe.ingredients.map((ingr) => (
+          <div key={ingr}>
+            <span className="font-bold">
+              {ingr.substring(0, ingr.indexOf(" "))}
+            </span>{" "}
+            <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+          </div>
+        ))}
+      </div>
+      <div className="col-span-2">
+        <h2>Steps</h2>
+        {recipe.steps.map((s, i) => (
+          <div key={s}>
+            <span className="font-bold">{i + 1}.</span>
+            {" " + s}
+          </div>
+        ))}
+      </div>
+    </div>
+  </>
+);
 
 export default RecipePage;
