@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from "react";
 import { OutlineButton } from "./Button";
 import { TextInput } from "./Input";
 import { PlusIcon, MinusIcon } from "@heroicons/react/solid";
-import styles from "../styles/New.module.css";
 
 const DynamicInput: React.FC<{
   setState: Dispatch<SetStateAction<string[]>>;
@@ -10,7 +9,7 @@ const DynamicInput: React.FC<{
   name: string;
 }> = ({ setState, state, name }) => {
   return (
-    <label className={styles.inputGroupVerticalCustom}>
+    <label>
       <h3>{name}</h3>
       {state.map((_field, i) => (
         <div key={`${i}_${name}`}>
@@ -24,8 +23,9 @@ const DynamicInput: React.FC<{
               setState(_state);
             }}
           />
+          <div className="h-2" />
 
-          <div className="btn-group">
+          <div className={state.length > 1 ? "btn-group" : ""}>
             {i === state.length - 1 && (
               <OutlineButton
                 icon={<PlusIcon />}

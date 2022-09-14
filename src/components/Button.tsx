@@ -20,13 +20,13 @@ export const OutlineButton: React.FC<{
   children?: React.ReactNode;
   onClick: React.MouseEventHandler;
   icon: React.ReactNode;
-
+  className?: string | undefined;
   disabled?: boolean;
-}> = ({ children, onClick, icon, disabled }) => {
+}> = ({ children, onClick, icon, disabled, className }) => {
   return (
     <button
       type="button"
-      className="mt-2 btn btn-outline"
+      className={"btn btn-outline " + (className ?? "")}
       onClick={onClick}
       disabled={disabled}
     >
