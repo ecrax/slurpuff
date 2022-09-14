@@ -7,10 +7,12 @@ import { trpc } from "../utils/trpc";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { type Session } from "next-auth";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Recipes: NextPage = () => {
   const { data: session, status } = useSession();
-  if (status === "loading") return <div>Loading...</div>;
+
+  if (status === "loading") return <LoadingSpinner />;
 
   if (session) return <RecipePageLoggedIn session={session} />;
   else return <RecipePageAnon />;
@@ -38,9 +40,9 @@ const RecipePageLoggedIn: React.FC<{ session: Session }> = ({ session }) => {
 
       <div className="container h-screen px-8 mx-auto">
         <main className="flex flex-col items-center justify-center mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {recipes && x && !isLoading ? (
-              recipes.map((recipe) => {
+          {recipes && x && !isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+              {recipes.map((recipe) => {
                 return (
                   <RecipeCard
                     session={session}
@@ -48,11 +50,11 @@ const RecipePageLoggedIn: React.FC<{ session: Session }> = ({ session }) => {
                     key={recipe.id}
                   />
                 );
-              })
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
+              })}
+            </div>
+          ) : (
+            <LoadingSpinner />
+          )}
         </main>
       </div>
     </>
@@ -71,15 +73,15 @@ const RecipePageAnon: React.FC = () => {
 
       <div className="container h-screen px-8 mx-auto">
         <main className="flex flex-col items-center justify-center mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-            {recipes ? (
-              recipes.map((recipe) => {
+          {recipes ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+              {recipes.map((recipe) => {
                 return <RecipeCard recipe={recipe} key={recipe.id} />;
-              })
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
+              })}
+            </div>
+          ) : (
+            <LoadingSpinner />
+          )}
         </main>
       </div>
     </>

@@ -4,12 +4,12 @@ import Link from "next/link";
 const Navbar = () => {
   const { data: session, status } = useSession();
 
-  if (status === "loading")
-    return (
-      <nav className="flex flex-row justify-between">
-        <div>Loading...</div>
-      </nav>
-    );
+  //if (status === "loading")
+  //  return (
+  //    <nav className="container px-8 pt-8 mx-auto navbar">
+  //      <div>Loading...</div>
+  //    </nav>
+  //  );
 
   return (
     <>

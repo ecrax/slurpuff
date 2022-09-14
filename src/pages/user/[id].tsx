@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import RecipeCard from "../../components/RecipeCard";
 import { trpc } from "../../utils/trpc";
 
@@ -77,7 +78,7 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
             </main>
           </>
         ) : (
-          <p>Loading...</p>
+          <LoadingSpinner />
         )}
       </div>
     </>

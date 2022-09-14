@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { savedRecipesAtom } from "../../utils/atoms";
 import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
@@ -28,11 +29,12 @@ const RecipePage: NextPage = () => {
   const _id = Number.parseInt(id);
   if (Number.isNaN(_id)) return <div>Please pass a number</div>;
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <LoadingSpinner />;
+  // if (status === "loading") return <></>;
 
   if (session) return <RecipePageContentLoggedIn session={session} id={_id} />;
   else return <RecipePageContentAnon id={_id} />;
-};
+};;
 
 const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
   const {
@@ -86,7 +88,7 @@ const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
             </main>
           </>
         ) : (
-          <p>Loading...</p>
+          <LoadingSpinner />
         )}
       </div>
     </>
@@ -237,7 +239,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
             </main>
           </>
         ) : (
-          <p>Loading...</p>
+          <LoadingSpinner />
         )}
       </div>
     </>

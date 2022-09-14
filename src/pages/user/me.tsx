@@ -8,11 +8,12 @@ import RecipeCard from "../../components/RecipeCard";
 import { savedRecipesAtom } from "../../utils/atoms";
 import { trpc } from "../../utils/trpc";
 import { useAtom } from "jotai";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const MePage: NextPage = () => {
   const { data: session, status } = useSession();
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <LoadingSpinner />;
 
   if (!session) return <div>You have to be logged in to view this page</div>;
 
@@ -90,7 +91,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
                     );
                   })
                 ) : (
-                  <Suspense fallback={<div>Loading...</div>}>
+                  <Suspense fallback={<LoadingSpinner height="h-full" />}>
                     <DynamicSavedRecipes
                       user={user}
                       session={session}
@@ -102,7 +103,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
             </main>
           </>
         ) : (
-          <p>Loading...</p>
+          <LoadingSpinner />
         )}
       </div>
     </>

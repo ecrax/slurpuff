@@ -8,6 +8,7 @@ import {
 import type { NextPage } from "next";
 import type { BuiltInProviderType } from "next-auth/providers";
 import { useRouter } from "next/router";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const SignIn: NextPage<{
   providers: Record<
@@ -18,7 +19,7 @@ const SignIn: NextPage<{
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") return <LoadingSpinner />;
   if (session) router.push("/recipes");
 
   return (

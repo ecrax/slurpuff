@@ -14,6 +14,7 @@ import type { Session } from "next-auth";
 import type { Recipe } from "@prisma/client";
 import Image from "next/image";
 import { uploadImage } from "../../../utils/uploadImage";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 const Edit: NextPage = () => {
   const { query } = useRouter();
@@ -57,7 +58,7 @@ const LoadRecipe: React.FC<{ session: Session; id: number }> = ({
       return <div>You can only edit a recipe if you are the author</div>;
     return <EditContent session={session} oldRecipe={oldRecipe} />;
   } else {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 };
 
