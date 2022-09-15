@@ -1,4 +1,3 @@
-import type { Recipe } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createRouter } from "./context";
@@ -20,28 +19,27 @@ export const userRouter = createRouter()
       return user;
     },
   })
-  .query("getUserRecipesById", {
-    input: z.object({
-      id: z.string().min(1),
-    }),
-    async resolve({ ctx, input }) {
-      const user = await ctx.prisma.user.findUnique({
-        where: { id: input.id },
-        select: {
-          recipes: true,
-        },
-      });
-      return user;
-    },
-  })
   .query("getAllUserRecipes", {
     input: z.object({
       id: z.string().min(1),
+      cursor: z.number().nullish(),
     }),
     async resolve({ ctx, input }) {
-      const recipes: Recipe[] = await ctx.prisma.recipe.findMany({
-        where: { authorId: input.id },
-      });
+      let recipes;
+      if (!input.cursor) {
+        recipes = await ctx.prisma.recipe.findMany({
+          take: 9,
+          where: { authorId: input.id },
+        });
+      } else {
+        recipes = await ctx.prisma.recipe.findMany({
+          take: 9,
+          skip: 1,
+          where: { authorId: input.id },
+          cursor: { id: input.cursor },
+        });
+      }
+
       return recipes;
     },
   })

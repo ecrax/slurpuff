@@ -8,14 +8,14 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] ability to save recipes
 - [x] Profile Page (view saved recipes)
 - [x] Rate recipes (only an initial star rating)
+- [x] Pagination for all pages where multiple recipes are displayed
+- [ ] refactor database to proper relational structure -> no more lists (easier tags search, clean deletion of recipes)
+- [ ] tags page
 - [ ] search
-- [ ] Pagination for all pages where multiple recipes are displayed
-- [ ] start displaying recipes by name and not by id in the url
-- [ ] eventually switch to planetscale
 - [ ] proper form checking and error feedback
 
 ### Optional Todos
-- [ ] Global state management for application wide optimistic updates of saved recipes
+- [x] Global state management for application wide optimistic updates of saved recipes
 
 ## DB
 Railway Postgres

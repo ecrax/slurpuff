@@ -12,8 +12,6 @@ const SavedRecipes: React.FC<{
   const [x] = useAtom(savedRecipesAtom);
   const savedRecipes = recipes.filter((r) => x!.includes(r.id));
 
-  if (savedRecipes.length === 0) return <div>No Recipes Saved Yet</div>;
-
   return (
     <>
       {savedRecipes.map((recipe) => {

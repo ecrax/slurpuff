@@ -24,10 +24,18 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
   const [x, setX] = useAtom(savedRecipesAtom);
   const { data: user, isLoading } = trpc.useQuery(["user.getCurrentUser"]);
 
-  const { data: recipes, isLoading: isRecipesLoading } = trpc.useQuery([
-    "user.getAllUserRecipes",
-    { id: session.user!.id! },
-  ]);
+  const {
+    data: recipePages,
+    isLoading: isRecipePagesLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = trpc.useInfiniteQuery(
+    ["user.getAllUserRecipes", { id: session.user!.id! }],
+    {
+      getNextPageParam: (lastPage) => lastPage.at(8)?.id,
+    }
+  );
 
   const [currentTab, setCurrentTab] = useState<"all" | "saved">("all");
 
@@ -46,7 +54,7 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        {!isLoading && x && !isRecipesLoading && recipes && user ? (
+        {!isLoading && x && !isRecipePagesLoading && recipePages && user ? (
           <>
             <main className="flex flex-col items-center justify-center pb-16">
               <div>
@@ -80,24 +88,47 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {currentTab === "all" ? (
-                  recipes.map((recipe) => {
-                    return (
-                      <RecipeCard
-                        dropdown={session.user?.id === recipe.authorId}
-                        key={recipe.id}
-                        recipe={recipe}
-                        session={session}
-                      />
-                    );
-                  })
+                  recipePages.pages.map((recipes) =>
+                    recipes.map((recipe) => {
+                      return (
+                        <RecipeCard
+                          session={session}
+                          recipe={recipe}
+                          key={recipe.id}
+                        />
+                      );
+                    })
+                  )
                 ) : (
                   <Suspense fallback={<LoadingSpinner height="h-full" />}>
-                    <DynamicSavedRecipes
-                      user={user}
-                      session={session}
-                      recipes={recipes}
-                    />
+                    {recipePages.pages.map((recipes, i) => {
+                      if (i === recipePages.pages.length)
+                        return <div>No Recipes Saved Yet</div>;
+                      return (
+                        <DynamicSavedRecipes
+                          user={user}
+                          session={session}
+                          recipes={recipes}
+                          key={"savedPage" + i}
+                        />
+                      );
+                    })}
                   </Suspense>
+                )}
+              </div>
+              <div className="mb-8 px-8 py-4 my-16">
+                {isFetchingNextPage ? (
+                  <LoadingSpinner height="mb-8 h-full" />
+                ) : hasNextPage ? (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={!hasNextPage || isFetchingNextPage}
+                    className="mb-8 px-8 py-4 bg-base-200 rounded-xl"
+                  >
+                    Load More
+                  </button>
+                ) : (
+                  ""
                 )}
               </div>
             </main>

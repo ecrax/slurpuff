@@ -4,8 +4,19 @@ import { createRouter } from "./context";
 
 export const recipeRouter = createRouter()
   .query("getAll", {
-    async resolve({ ctx }) {
-      const recipes = await ctx.prisma.recipe.findMany();
+    input: z.object({ cursor: z.number().nullish() }),
+    async resolve({ ctx, input }) {
+      let recipes;
+      if (!input.cursor) {
+        recipes = await ctx.prisma.recipe.findMany({ take: 9 });
+      } else {
+        recipes = await ctx.prisma.recipe.findMany({
+          take: 9,
+          skip: 1,
+          cursor: { id: input.cursor },
+        });
+      }
+
       return recipes;
     },
   })
@@ -99,6 +110,27 @@ export const recipeRouter = createRouter()
       });
     },
   })
+  //.mutation("insertTests", {
+  //  resolve: async ({ ctx }) => {
+  //    for (let i = 0; i < 20; i++) {
+  //      console.log("test");
+  //
+  //      await ctx.prisma.recipe.create({
+  //        data: {
+  //          image:
+  //            "http://res.cloudinary.com/ecrax/image/upload/v1660649006/slurpuff/dtl9gi7erh1irkccanpm.jpg",
+  //          name: i.toString(),
+  //          rating: 1,
+  //          timeRequired: 360000,
+  //          authorId: "cl6w3f4zy0261lap9e61safzd",
+  //          ingredients: ["dsad"],
+  //          steps: ["dsad"],
+  //          tags: ["dsad"],
+  //        },
+  //      });
+  //    }
+  //  },
+  //})
   .mutation("delete", {
     input: z.object({ id: z.number(), authorId: z.string() }),
     resolve: async ({ input, ctx }) => {

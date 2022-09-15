@@ -23,10 +23,15 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
     error,
   } = trpc.useQuery(["user.getUserDataById", { id: id }]);
 
-  const { data: recipes, isLoading: isRecipesLoading } = trpc.useQuery([
-    "user.getAllUserRecipes",
-    { id: id },
-  ]);
+  const {
+    data: recipePages,
+    isLoading: isRecipePagesLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = trpc.useInfiniteQuery(["user.getAllUserRecipes", { id: id }], {
+    getNextPageParam: (lastPage) => lastPage.at(8)?.id,
+  });
 
   const { data: session, status } = useSession();
 
@@ -49,8 +54,8 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
       <div className="container h-screen px-8 mx-auto">
         {!isLoading &&
         status !== "loading" &&
-        !isRecipesLoading &&
-        recipes &&
+        !isRecipePagesLoading &&
+        recipePages &&
         user ? (
           <>
             <main className="flex flex-col items-center justify-center pb-16">
@@ -65,15 +70,32 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
                 <h1 className="py-8 mb-2 text-4xl font-bold">{user.name}</h1>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-                {recipes.map((recipe) => {
-                  return (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                      session={session}
-                    />
-                  );
-                })}
+                {recipePages.pages.map((recipes) =>
+                  recipes.map((recipe) => {
+                    return (
+                      <RecipeCard
+                        session={session}
+                        recipe={recipe}
+                        key={recipe.id}
+                      />
+                    );
+                  })
+                )}
+              </div>
+              <div className="mb-8 px-8 py-4 my-16">
+                {isFetchingNextPage ? (
+                  <LoadingSpinner height="mb-8 h-full" />
+                ) : hasNextPage ? (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={!hasNextPage || isFetchingNextPage}
+                    className="mb-8 px-8 py-4 bg-base-200 rounded-xl"
+                  >
+                    Load More
+                  </button>
+                ) : (
+                  ""
+                )}
               </div>
             </main>
           </>

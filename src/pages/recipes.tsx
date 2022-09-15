@@ -20,7 +20,14 @@ const Recipes: NextPage = () => {
 
 const RecipePageLoggedIn: React.FC<{ session: Session }> = ({ session }) => {
   const [x, setX] = useAtom(savedRecipesAtom);
-  const { data: recipes } = trpc.useQuery(["recipe.getAll"]);
+  const {
+    data: recipePages,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = trpc.useInfiniteQuery(["recipe.getAll", {}], {
+    getNextPageParam: (lastPage) => lastPage.at(8)?.id,
+  });
   const { data: user, isLoading } = trpc.useQuery(["user.getCurrentUser"], {
     enabled: !!session.user?.id,
   });
@@ -40,18 +47,37 @@ const RecipePageLoggedIn: React.FC<{ session: Session }> = ({ session }) => {
 
       <div className="container h-screen px-8 mx-auto">
         <main className="flex flex-col items-center justify-center mt-8">
-          {recipes && x && !isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-              {recipes.map((recipe) => {
-                return (
-                  <RecipeCard
-                    session={session}
-                    recipe={recipe}
-                    key={recipe.id}
-                  />
-                );
-              })}
-            </div>
+          {recipePages && x && !isLoading ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+                {recipePages.pages.map((recipes) =>
+                  recipes.map((recipe) => {
+                    return (
+                      <RecipeCard
+                        session={session}
+                        recipe={recipe}
+                        key={recipe.id}
+                      />
+                    );
+                  })
+                )}
+              </div>
+              <div className="mb-8 px-8 py-4 my-16">
+                {isFetchingNextPage ? (
+                  <LoadingSpinner height="mb-8 h-full" />
+                ) : hasNextPage ? (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={!hasNextPage || isFetchingNextPage}
+                    className="mb-8 px-8 py-4 bg-base-200 rounded-xl"
+                  >
+                    Load More
+                  </button>
+                ) : (
+                  ""
+                )}
+              </div>
+            </>
           ) : (
             <LoadingSpinner />
           )}
@@ -61,7 +87,14 @@ const RecipePageLoggedIn: React.FC<{ session: Session }> = ({ session }) => {
   );
 };
 const RecipePageAnon: React.FC = () => {
-  const { data: recipes } = trpc.useQuery(["recipe.getAll"]);
+  const {
+    data: recipePages,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = trpc.useInfiniteQuery(["recipe.getAll", {}], {
+    getNextPageParam: (lastPage) => lastPage.at(8)?.id,
+  });
 
   return (
     <>
@@ -73,12 +106,31 @@ const RecipePageAnon: React.FC = () => {
 
       <div className="container h-screen px-8 mx-auto">
         <main className="flex flex-col items-center justify-center mt-8">
-          {recipes ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-              {recipes.map((recipe) => {
-                return <RecipeCard recipe={recipe} key={recipe.id} />;
-              })}
-            </div>
+          {recipePages ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+                {recipePages.pages.map((recipes) =>
+                  recipes.map((recipe) => {
+                    return <RecipeCard recipe={recipe} key={recipe.id} />;
+                  })
+                )}
+              </div>
+              <div className="mb-8 px-8 py-4 my-16">
+                {isFetchingNextPage ? (
+                  <LoadingSpinner height="mb-8 h-full" />
+                ) : hasNextPage ? (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={!hasNextPage || isFetchingNextPage}
+                    className="mb-8 px-8 py-4 bg-base-200 rounded-xl"
+                  >
+                    Load More
+                  </button>
+                ) : (
+                  ""
+                )}
+              </div>
+            </>
           ) : (
             <LoadingSpinner />
           )}

@@ -112,27 +112,27 @@ const RecipeCardLoggedIn: React.FC<{
                   className="px-2 btn btn-ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (!x!.includes(recipe.id)) {
+                    if (!x?.includes(recipe.id)) {
                       //add to saved recipes
                       addRecipe({
                         id: session.user?.id!,
                         recipeId: recipe.id,
                       });
-                      setX([...x!, recipe.id]);
+                      setX([...(x ?? []), recipe.id]);
                     } else {
                       //remove from saved recipes
                       removeRecipe({
                         id: session.user?.id!,
                         recipeId: recipe.id,
                       });
-                      const d = [...x!];
+                      const d = [...x];
                       const i = d.indexOf(recipe.id, 0);
                       if (i > -1) d.splice(i, 1);
                       setX(d);
                     }
                   }}
                 >
-                  {x!.includes(recipe.id) ? (
+                  {x && x.includes(recipe.id) ? (
                     <BookmarkIconSolid className="w-4 h-4" />
                   ) : (
                     <BookmarkIconOutline className="w-4 h-4" />
@@ -197,7 +197,7 @@ const CardTabs: React.FC<{ recipe: Recipe }> = ({ recipe }) => (
         (_, i) => (
           <input
             type="radio"
-            name={`${i}_rating`}
+            name={`${i}_rating_${recipe.id}`}
             className="mask mask-star-2 bg-primary"
             style={{
               transform: "none",
