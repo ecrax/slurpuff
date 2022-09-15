@@ -216,7 +216,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                             {/* <span>Delete</span> */}
                             <label
                               htmlFor="delete-modal"
-                              className="btn modal-button"
+                              className="btn modal-button btn-error"
                             >
                               Delete
                             </label>
@@ -253,7 +253,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                                   router.replace("/recipes");
                                 }}
                                 htmlFor="delete-modal"
-                                className="btn"
+                                className="btn btn-error"
                               >
                                 Delete
                               </label>
