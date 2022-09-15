@@ -132,7 +132,7 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
       },
       {
         onSuccess() {
-          console.log("update successfull");
+          //console.log("update successfull");
           router.push(`/recipe/${oldRecipe.id}`);
         },
       }

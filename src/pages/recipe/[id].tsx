@@ -212,19 +212,54 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                           >
                             <span>Share</span>
                           </li>
-                          <li
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteRecipe({
-                                id: recipe.id,
-                                authorId: recipe.authorId,
-                              });
-                              router.replace("/recipes");
-                            }}
-                          >
-                            <span>Delete</span>
+                          <li>
+                            {/* <span>Delete</span> */}
+                            <label
+                              htmlFor="delete-modal"
+                              className="btn modal-button"
+                            >
+                              Delete
+                            </label>
                           </li>
                         </ul>
+                        <input
+                          type="checkbox"
+                          id="delete-modal"
+                          className="modal-toggle"
+                        />
+                        <div className="modal">
+                          <div className="modal-box">
+                            <h3 className="font-bold text-lg">
+                              Do you really want to delete the recipe?
+                            </h3>
+
+                            <div className="modal-action">
+                              <label
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                htmlFor="delete-modal"
+                                className="btn"
+                              >
+                                Cancel
+                              </label>
+                              <label
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteRecipe({
+                                    id: recipe.id,
+                                    authorId: recipe.authorId,
+                                  });
+                                  router.replace("/recipes");
+                                }}
+                                htmlFor="delete-modal"
+                                className="btn"
+                              >
+                                Delete
+                              </label>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

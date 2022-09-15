@@ -58,8 +58,8 @@ const New: NextPage = () => {
       },
       {
         onSuccess() {
-          console.log("creation successfull");
-          router.push("/");
+          //console.log("creation successfull");
+          router.push("/recipes");
         },
       }
     );
