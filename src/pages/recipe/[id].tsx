@@ -104,10 +104,9 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
     error,
   } = trpc.useQuery(["recipe.getById", { id: id }]);
 
-  const { data: user, isLoading: isLoading } = trpc.useQuery(
-    ["user.getCurrentUser"],
-    { enabled: !!recipe?.authorId }
-  );
+  const { data: user, isLoading: isLoading } = trpc.useQuery([
+    "user.getCurrentUser",
+  ]);
   const { mutate: deleteRecipe } = trpc.useMutation(["recipe.delete"]);
   const { mutate: addSavedRecipe } = trpc.useMutation("user.addSavedRecipe");
   const { mutate: removeSavedRecipe } = trpc.useMutation(
@@ -233,6 +232,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                 <RecipePageContent
                   user={{ id: user.id, name: user.name ?? "" }}
                   recipe={recipe}
+                  currentUserId={session.user?.id}
                 />
               </div>
             </main>
@@ -248,9 +248,12 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
 const RecipePageContent: React.FC<{
   user: { id: string; name: string };
   recipe: Recipe;
-}> = ({ recipe, user }) => (
+  currentUserId?: string | undefined;
+}> = ({ recipe, user, currentUserId }) => (
   <>
-    <Link href={`/user/${user.id}`}>
+    <Link
+      href={currentUserId === recipe.authorId ? "/user/me" : `/user/${user.id}`}
+    >
       <p className="link">by {user.name}</p>
     </Link>
     <div className="">
