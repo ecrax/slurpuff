@@ -1,3 +1,4 @@
+import { useAtom } from "jotai";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
@@ -5,6 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import RecipeCard from "../../components/RecipeCard";
+import { savedRecipesAtom } from "../../utils/atoms";
 import { trpc } from "../../utils/trpc";
 
 const UserPage: NextPage = () => {
@@ -23,6 +25,10 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
     error,
   } = trpc.useQuery(["user.getUserDataById", { id: id }]);
 
+  const { data: currentUser, isLoading: idCurrentUserLoading } = trpc.useQuery([
+    "user.getCurrentUser",
+  ]);
+
   const {
     data: recipePages,
     isLoading: isRecipePagesLoading,
@@ -32,6 +38,13 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
   } = trpc.useInfiniteQuery(["user.getAllUserRecipes", { id: id }], {
     getNextPageParam: (lastPage) => lastPage.at(8)?.id,
   });
+  const [x, setX] = useAtom(savedRecipesAtom);
+
+  useEffect(() => {
+    if (!x && currentUser?.savedRecipes)
+      setX(currentUser.savedRecipes.map((v) => v.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.savedRecipes]);
 
   const { data: session, status } = useSession();
 
@@ -55,6 +68,8 @@ const UserPageContent: React.FC<{ id: string }> = ({ id }) => {
         {!isLoading &&
         status !== "loading" &&
         !isRecipePagesLoading &&
+        !idCurrentUserLoading &&
+        x &&
         recipePages &&
         user ? (
           <>

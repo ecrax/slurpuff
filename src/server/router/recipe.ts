@@ -4,16 +4,38 @@ import { createRouter } from "./context";
 
 export const recipeRouter = createRouter()
   .query("getAll", {
-    input: z.object({ cursor: z.number().nullish() }),
+    input: z.object({ cursor: z.string().nullish() }),
     async resolve({ ctx, input }) {
       let recipes;
       if (!input.cursor) {
-        recipes = await ctx.prisma.recipe.findMany({ take: 9 });
+        recipes = await ctx.prisma.recipe.findMany({
+          take: 9,
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            rating: true,
+            steps: true,
+            tags: true,
+            timeRequired: true,
+          },
+        });
       } else {
         recipes = await ctx.prisma.recipe.findMany({
           take: 9,
           skip: 1,
-          cursor: { id: input.cursor },
+          cursor: {
+            id: input.cursor,
+          },
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            rating: true,
+            steps: true,
+            tags: true,
+            timeRequired: true,
+          },
         });
       }
 
@@ -22,16 +44,18 @@ export const recipeRouter = createRouter()
   })
   .query("getById", {
     input: z.object({
-      id: z.number().min(1),
+      id: z.string(),
     }),
     resolve: async ({ input, ctx }) => {
       const recipe = await ctx.prisma.recipe.findUnique({
         where: { id: input.id },
+        include: { tags: true },
       });
 
       if (recipe === null) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
+
       return recipe;
     },
   })
@@ -63,7 +87,12 @@ export const recipeRouter = createRouter()
           ingredients: input.ingredients,
           steps: input.steps,
           timeRequired: input.timeRequired,
-          tags: input.tags,
+          tags: {
+            connectOrCreate: input.tags.map((tag) => ({
+              where: { name: tag },
+              create: { name: tag },
+            })),
+          },
           notes: input.notes,
           rating: input.rating,
           authorId: ctx.session?.user?.id!,
@@ -73,13 +102,14 @@ export const recipeRouter = createRouter()
   })
   .mutation("update", {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
       name: z.string().nullish(),
       image: z.string().nullish(),
       ingredients: z.array(z.string()).nullish(),
       steps: z.array(z.string()).nullish(),
       timeRequired: z.number().nullish(),
       tags: z.array(z.string()).nullish(),
+      oldTags: z.array(z.string()),
       notes: z.string().nullish(),
       rating: z.number().nullish(),
     }),
@@ -103,7 +133,23 @@ export const recipeRouter = createRouter()
           ingredients: input.ingredients ?? undefined,
           steps: input.steps ?? undefined,
           timeRequired: input.timeRequired ?? undefined,
-          tags: input.tags ?? undefined,
+          tags: !input.tags
+            ? undefined
+            : {
+                disconnect: input.oldTags
+                  .filter((x) => !input.tags?.includes(x))
+                  .map((tag) => ({
+                    name: tag,
+                  })),
+                connectOrCreate: input.tags.map((tag) => ({
+                  where: {
+                    name: tag,
+                  },
+                  create: {
+                    name: tag,
+                  },
+                })),
+              },
           notes: input.notes ?? undefined,
           rating: input.rating ?? undefined,
         },
@@ -132,14 +178,10 @@ export const recipeRouter = createRouter()
   //  },
   //})
   .mutation("delete", {
-    input: z.object({ id: z.number(), authorId: z.string() }),
+    input: z.object({ recipeId: z.string() }),
     resolve: async ({ input, ctx }) => {
-      if (ctx.session?.user?.id !== input.authorId) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
       const recipe = await ctx.prisma.recipe.findUniqueOrThrow({
-        where: { id: input.id },
+        where: { id: input.recipeId },
         select: { authorId: true },
       });
       if (recipe.authorId !== ctx.session?.user?.id) {
@@ -148,7 +190,7 @@ export const recipeRouter = createRouter()
 
       await ctx.prisma.recipe.delete({
         where: {
-          id: input.id,
+          id: input.recipeId,
         },
       });
     },

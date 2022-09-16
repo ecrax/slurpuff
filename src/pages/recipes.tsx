@@ -33,9 +33,9 @@ const RecipePageLoggedIn: React.FC<{ session: Session }> = ({ session }) => {
   });
 
   useEffect(() => {
-    if (!x && user?.savedRecipes) setX(user.savedRecipes);
+    if (!x && user?.savedRecipes) setX(user.savedRecipes.map((v) => v.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.savedRecipes, session]);
+  }, [user?.savedRecipes]);
 
   return (
     <>

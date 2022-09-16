@@ -35,7 +35,7 @@ const SignIn: NextPage<{
   );
 };
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const providers = await getProviders();
   return {
     props: { providers },

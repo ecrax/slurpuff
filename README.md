@@ -9,9 +9,10 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] Profile Page (view saved recipes)
 - [x] Rate recipes (only an initial star rating)
 - [x] Pagination for all pages where multiple recipes are displayed
-- [ ] refactor database to proper relational structure -> no more lists (easier tags search, clean deletion of recipes)
+- [x] refactor database to proper relational structure -> no more lists (easier tags search, clean deletion of recipes)
 - [ ] tags page
 - [ ] search
+- [ ] autocomplete on tags, when editing or creating
 - [ ] proper form checking and error feedback
 
 ### Optional Todos

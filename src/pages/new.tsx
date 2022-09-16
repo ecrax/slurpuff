@@ -11,6 +11,7 @@ import { PlusIcon } from "@heroicons/react/solid";
 import styles from "../styles/New.module.css";
 import { useRouter } from "next/router";
 import { uploadImage } from "../utils/uploadImage";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
@@ -66,7 +67,7 @@ const New: NextPage = () => {
   };
 
   if (status === "loading") {
-    return <p>Loading</p>;
+    return <LoadingSpinner />;
   } else if (!session) {
     return <p>Please Sign in</p>;
   } else {

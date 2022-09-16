@@ -12,30 +12,38 @@ datasource db {
 }
 
 model Recipe {
-    id           Int      @id @default(autoincrement())
+    id           String   @id @default(cuid())
     image        String
-    name         String
+    name         String   @unique
     ingredients  String[]
     steps        String[]
     timeRequired Int
     notes        String?
-    author       User     @relation(fields: [authorId], references: [id])
+    author       User     @relation(fields: [authorId], references: [id], name: "author")
     authorId     String
-    tags         String[]
+    savedBy      User[]   @relation(name: "saves")
+    tags         Tag[]
     rating       Int
     createdAt    DateTime @default(now())
 }
 
+model Tag {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    name      String   @unique
+    recipes   Recipe[]
+}
+
 model User {
-    id            String    @id @default(cuid())
-    email         String    @unique
-    name          String?
-    image         String?
-    createdAt     DateTime  @default(now())
-    recipes       Recipe[]
-    savedRecipes  Int[]
-    accounts      Account[]
-    sessions      Session[]
+    id           String    @id @default(cuid())
+    email        String    @unique
+    name         String?
+    image        String?
+    createdAt    DateTime  @default(now())
+    recipes      Recipe[]  @relation(name: "author")
+    savedRecipes Recipe[]  @relation(name: "saves")
+    accounts     Account[]
+    sessions     Session[]
 }
 
 model Account {

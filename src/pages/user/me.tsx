@@ -40,10 +40,9 @@ const MePageContent: React.FC<{ session: Session }> = ({ session }) => {
   const [currentTab, setCurrentTab] = useState<"all" | "saved">("all");
 
   useEffect(() => {
-    if (!x && user?.savedRecipes) setX(user.savedRecipes);
-    if (!session) setX([]);
+    if (!x && user?.savedRecipes) setX(user.savedRecipes.map((v) => v.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.savedRecipes, session]);
+  }, [user?.savedRecipes]);
 
   return (
     <>

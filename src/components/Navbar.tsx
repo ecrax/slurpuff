@@ -44,9 +44,9 @@ const Navbar = () => {
               <li>
                 <Link href="/new">New</Link>
               </li>
-              <li>
-                <a>Settings</a>
-              </li>
+              {/* <li> */}
+              {/* <a>Settings</a> */}
+              {/* </li> */}
               <li>
                 <a
                   onClick={() => {

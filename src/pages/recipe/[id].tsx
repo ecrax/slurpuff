@@ -3,7 +3,7 @@ import {
   BookmarkIcon as BookmarkIconSolid,
   ChevronDownIcon,
 } from "@heroicons/react/solid";
-import type { Recipe, User } from "@prisma/client";
+import type { Recipe, Tag, User } from "@prisma/client";
 import { useAtom } from "jotai";
 import type { NextPage } from "next";
 import { type Session } from "next-auth";
@@ -26,16 +26,13 @@ const RecipePage: NextPage = () => {
 
   if (!id || typeof id !== "string") return <div>No id</div>;
 
-  const _id = Number.parseInt(id);
-  if (Number.isNaN(_id)) return <div>Please pass a number</div>;
-
   if (status === "loading") return <LoadingSpinner />;
 
-  if (session) return <RecipePageContentLoggedIn session={session} id={_id} />;
-  else return <RecipePageContentAnon id={_id} />;
+  if (session) return <RecipePageContentLoggedIn session={session} id={id} />;
+  else return <RecipePageContentAnon id={id} />;
 };
 
-const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
+const RecipePageContentAnon: React.FC<{ id: string }> = ({ id }) => {
   const {
     data: recipe,
     isLoading: isRecipeLoading,
@@ -94,7 +91,7 @@ const RecipePageContentAnon: React.FC<{ id: number }> = ({ id }) => {
   );
 };
 
-const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
+const RecipePageContentLoggedIn: React.FC<{ id: string; session: Session }> = ({
   id,
   session,
 }) => {
@@ -116,9 +113,9 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
   const [x, setX] = useAtom(savedRecipesAtom);
 
   useEffect(() => {
-    if (!x && user?.savedRecipes) setX(user.savedRecipes);
+    if (!x && user?.savedRecipes) setX(user.savedRecipes.map((v) => v.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.savedRecipes, session]);
+  }, [user?.savedRecipes]);
 
   const router = useRouter();
 
@@ -153,33 +150,31 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
               <div className="w-full">
                 <div className="flex flex-row justify-between md:justify-start items-baseline">
                   <h1 className="pt-8 mb-2">{recipe.name}</h1>{" "}
-                  <div className="flex flex-col md:flex-row items-center">
+                  <div className="md:pl-4 flex flex-col md:flex-row justify-center items-center">
                     {session && (
                       <div
-                        className="ml-4 btn btn-ghost"
+                        className="px-2 btn btn-ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (!x!.includes(recipe.id)) {
+                          if (!x?.includes(recipe.id)) {
                             //add to saved recipes
                             addSavedRecipe({
-                              id: session.user?.id!,
                               recipeId: recipe.id,
                             });
-                            setX([...x!, recipe.id]);
+                            setX([...(x ?? []), recipe.id]);
                           } else {
                             //remove from saved recipes
                             removeSavedRecipe({
-                              id: session.user?.id!,
                               recipeId: recipe.id,
                             });
-                            const d = [...x!];
+                            const d = [...x];
                             const i = d.indexOf(recipe.id, 0);
                             if (i > -1) d.splice(i, 1);
                             setX(d);
                           }
                         }}
                       >
-                        {x!.includes(recipe.id) ? (
+                        {x && x.includes(recipe.id) ? (
                           <BookmarkIconSolid className="w-4 h-4" />
                         ) : (
                           <BookmarkIconOutline className="w-4 h-4" />
@@ -187,7 +182,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                       </div>
                     )}
                     {session && session.user?.id === recipe.authorId && (
-                      <div className="ml-4 dropdown dropdown-left lg:dropdown-right">
+                      <div className="md:ml-4 flex dropdown dropdown-left lg:dropdown-right">
                         <label
                           tabIndex={0}
                           className="btn btn-ghost btn-sm"
@@ -247,8 +242,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   deleteRecipe({
-                                    id: recipe.id,
-                                    authorId: recipe.authorId,
+                                    recipeId: recipe.id,
                                   });
                                   router.replace("/recipes");
                                 }}
@@ -282,15 +276,21 @@ const RecipePageContentLoggedIn: React.FC<{ id: number; session: Session }> = ({
 
 const RecipePageContent: React.FC<{
   user: { id: string; name: string };
-  recipe: Recipe;
+  recipe: Recipe & {
+    tags: Tag[];
+  };
   currentUserId?: string | undefined;
 }> = ({ recipe, user, currentUserId }) => (
   <>
-    <Link
-      href={currentUserId === recipe.authorId ? "/user/me" : `/user/${user.id}`}
-    >
-      <p className="link">by {user.name}</p>
-    </Link>
+    <div className="flex">
+      <Link
+        href={
+          currentUserId === recipe.authorId ? "/user/me" : `/user/${user.id}`
+        }
+      >
+        <p className="link">by {user.name}</p>
+      </Link>
+    </div>
     <div className="">
       <span className="badge badge-primary mr-2">
         {recipe.steps.length} Step
@@ -301,9 +301,9 @@ const RecipePageContent: React.FC<{
         {msToTimeString(recipe.timeRequired)}
       </span>
 
-      {recipe.tags.map((t) => (
-        <span className="badge badge-ghost mr-2" key={t}>
-          {t}
+      {recipe.tags.map(({ name }) => (
+        <span className="badge badge-ghost mr-2" key={name + "_" + recipe.id}>
+          {name}
         </span>
       ))}
     </div>

@@ -11,7 +11,7 @@ import { ImageInput, NumberInput, TextInput } from "../../../components/Input";
 import DynamicInput from "../../../components/DynamicInput";
 import { FilledButton } from "../../../components/Button";
 import type { Session } from "next-auth";
-import type { Recipe } from "@prisma/client";
+import type { Recipe, Tag } from "@prisma/client";
 import Image from "next/image";
 import { uploadImage } from "../../../utils/uploadImage";
 import LoadingSpinner from "../../../components/LoadingSpinner";
@@ -23,19 +23,16 @@ const Edit: NextPage = () => {
 
   if (!id || typeof id !== "string") return <div>No id</div>;
 
-  const _id = Number.parseInt(id);
-  if (Number.isNaN(_id)) return <p>Please pass a number</p>;
-
   if (status === "loading") {
-    return <p>Loading</p>;
+    return <LoadingSpinner />;
   } else if (!session) {
     return <p>Please Sign in</p>;
   }
 
-  return <LoadRecipe session={session} id={_id} />;
+  return <LoadRecipe session={session} id={id} />;
 };
 
-const LoadRecipe: React.FC<{ session: Session; id: number }> = ({
+const LoadRecipe: React.FC<{ session: Session; id: string }> = ({
   id,
   session,
 }) => {
@@ -71,10 +68,12 @@ const arrayIsEqual = (array1: string[], array2: string[]) => {
   );
 };
 
-const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
-  session,
-  oldRecipe,
-}) => {
+const EditContent: React.FC<{
+  session: Session;
+  oldRecipe: Recipe & {
+    tags: Tag[];
+  };
+}> = ({ session, oldRecipe }) => {
   const router = useRouter();
 
   const {
@@ -87,7 +86,8 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
 
   const [ingredients, setIngredients] = useState(oldRecipe.ingredients);
   const [steps, setSteps] = useState(oldRecipe.steps);
-  const [tags, setTags] = useState(oldRecipe.tags);
+  const oldTagsAsStrings = oldRecipe.tags.map(({ name }) => name);
+  const [tags, setTags] = useState(oldTagsAsStrings);
   const [name, setName] = useState(oldRecipe.name);
   const [notes, setNotes] = useState(oldRecipe.notes);
   const [image, setImage] = useState<File>();
@@ -121,9 +121,10 @@ const EditContent: React.FC<{ session: Session; oldRecipe: Recipe }> = ({
         steps: arrayIsEqual(steps, oldRecipe.steps)
           ? undefined
           : steps.map((v) => v.trim()),
-        tags: arrayIsEqual(tags, oldRecipe.tags)
+        tags: arrayIsEqual(tags, oldTagsAsStrings)
           ? undefined
           : tags.map((v) => v.trim()),
+        oldTags: oldTagsAsStrings,
         image: !uploadedImageUrl ? undefined : uploadedImageUrl,
         timeRequired:
           durationMs === oldRecipe.timeRequired ? undefined : durationMs,

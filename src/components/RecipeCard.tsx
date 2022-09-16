@@ -6,14 +6,22 @@ import {
   BookmarkIcon as BookmarkIconSolid,
   ChevronDownIcon,
 } from "@heroicons/react/solid";
-import type { Recipe } from "@prisma/client";
 import type { Session } from "next-auth";
 import { trpc } from "../utils/trpc";
 import { useAtom } from "jotai";
 import { savedRecipesAtom } from "../utils/atoms";
+import type { Tag } from "@prisma/client";
 
 const RecipeCard: React.FC<{
-  recipe: Recipe;
+  recipe: {
+    id: string;
+    image: string;
+    name: string;
+    rating: number;
+    steps: string[];
+    tags: Tag[];
+    timeRequired: number;
+  };
   session?: Session | null;
   dropdown?: boolean;
 }> = ({ recipe, dropdown = false, session }) => {
@@ -29,14 +37,22 @@ const RecipeCard: React.FC<{
 };
 
 const RecipeCardAnon: React.FC<{
-  recipe: Recipe;
+  recipe: {
+    id: string;
+    image: string;
+    name: string;
+    rating: number;
+    steps: string[];
+    tags: Tag[];
+    timeRequired: number;
+  };
   dropdown?: boolean;
 }> = ({ recipe, dropdown }) => {
   return (
     <Link href={`/recipe/${recipe.id}`}>
       <div className="border-2 rounded-md cursor-pointer border-primary">
         <Image
-          width={445}
+          width={530}
           height={300}
           src={recipe.image}
           alt={recipe.name}
@@ -82,7 +98,15 @@ const RecipeCardAnon: React.FC<{
   );
 };
 const RecipeCardLoggedIn: React.FC<{
-  recipe: Recipe;
+  recipe: {
+    id: string;
+    image: string;
+    name: string;
+    rating: number;
+    steps: string[];
+    tags: Tag[];
+    timeRequired: number;
+  };
   session: Session;
   dropdown?: boolean;
 }> = ({ recipe, dropdown = false, session }) => {
@@ -95,7 +119,7 @@ const RecipeCardLoggedIn: React.FC<{
     <Link href={`/recipe/${recipe.id}`}>
       <div className="border-2 rounded-md cursor-pointer border-primary">
         <Image
-          width={445}
+          width={530}
           height={300}
           src={recipe.image}
           alt={recipe.name}
@@ -115,14 +139,12 @@ const RecipeCardLoggedIn: React.FC<{
                     if (!x?.includes(recipe.id)) {
                       //add to saved recipes
                       addRecipe({
-                        id: session.user?.id!,
                         recipeId: recipe.id,
                       });
                       setX([...(x ?? []), recipe.id]);
                     } else {
                       //remove from saved recipes
                       removeRecipe({
-                        id: session.user?.id!,
                         recipeId: recipe.id,
                       });
                       const d = [...x];
@@ -180,7 +202,17 @@ const RecipeCardLoggedIn: React.FC<{
 
 export default RecipeCard;
 
-const CardTabs: React.FC<{ recipe: Recipe }> = ({ recipe }) => (
+const CardTabs: React.FC<{
+  recipe: {
+    id: string;
+    image: string;
+    name: string;
+    rating: number;
+    steps: string[];
+    tags: Tag[];
+    timeRequired: number;
+  };
+}> = ({ recipe }) => (
   <div className="card-actions">
     <p className="badge badge-primary">
       {recipe.steps.length} Step
@@ -211,10 +243,10 @@ const CardTabs: React.FC<{ recipe: Recipe }> = ({ recipe }) => (
       )}
     </div>
 
-    {recipe.tags.map((t, i) => {
+    {recipe.tags.map(({ name }, i) => {
       return (
-        <p className="badge badge-ghost" key={i}>
-          {t}
+        <p className="badge badge-ghost" key={name + "_" + recipe.id}>
+          {name}
         </p>
       );
     })}
