@@ -246,7 +246,7 @@ const CardTabs: React.FC<{
     {recipe.tags.map(({ name }, i) => {
       return (
         <p
-          className="badge badge-ghost underline font-semibold capitalize"
+          className="badge badge-ghost underline font-medium capitalize"
           key={name + "_" + recipe.id}
         >
           <Link href={"/tag/" + name}>{name}</Link>

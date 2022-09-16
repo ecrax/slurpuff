@@ -1,6 +1,8 @@
-import { useAtom } from "jotai";
+import type { Tag } from "@prisma/client";
 import type { NextPage } from "next";
 import type { Session } from "next-auth";
+import type { InfiniteData } from "react-query";
+import { useAtom } from "jotai";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -9,6 +11,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import RecipeCard from "../../components/RecipeCard";
 import { savedRecipesAtom } from "../../utils/atoms";
 import { trpc } from "../../utils/trpc";
+import Link from "next/link";
 
 const TagPage: NextPage = () => {
   const { query } = useRouter();
@@ -37,6 +40,16 @@ const TagPageContentLoggedIn: React.FC<{ name: string; session: Session }> = ({
   } = trpc.useInfiniteQuery(["recipe.getAllWithTag", { tag: name }], {
     getNextPageParam: (lastPage) => lastPage.at(8)?.id,
   });
+
+  const {
+    data: tagPages,
+    fetchNextPage: fetchNextTagPage,
+    isFetchingNextPage: isFetchingNextTagPage,
+    hasNextPage: hasNextTagPage,
+  } = trpc.useInfiniteQuery(["tags.getAllTags", {}], {
+    getNextPageParam: (lastPage) => lastPage.at(9)?.id,
+  });
+
   const { data: user, isLoading } = trpc.useQuery(["user.getCurrentUser"], {
     enabled: !!session.user?.id,
   });
@@ -55,10 +68,16 @@ const TagPageContentLoggedIn: React.FC<{ name: string; session: Session }> = ({
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        <h1 className="text-4xl font-extrabold capitalize">{name}</h1>
-        <main className="flex flex-col items-center justify-center mt-8">
-          {recipePages && x && !isLoading ? (
-            <>
+        {recipePages && tagPages && x && !isLoading ? (
+          <>
+            <TagPageHeader
+              tagPages={tagPages}
+              fetchNextPage={fetchNextTagPage}
+              hasNextPage={hasNextTagPage}
+              isFetchingNextPage={isFetchingNextTagPage}
+              name={name}
+            />
+            <main className="flex flex-col items-center justify-center mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {recipePages.pages.map((recipes) =>
                   recipes.map((recipe) => {
@@ -87,11 +106,11 @@ const TagPageContentLoggedIn: React.FC<{ name: string; session: Session }> = ({
                   ""
                 )}
               </div>
-            </>
-          ) : (
-            <LoadingSpinner />
-          )}
-        </main>
+            </main>
+          </>
+        ) : (
+          <LoadingSpinner />
+        )}
       </div>
     </>
   );
@@ -107,6 +126,15 @@ const TagPageContentAnon: React.FC<{ name: string }> = ({ name }) => {
     getNextPageParam: (lastPage) => lastPage.at(8)?.id,
   });
 
+  const {
+    data: tagPages,
+    fetchNextPage: fetchNextTagPage,
+    isFetchingNextPage: isFetchingNextTagPage,
+    hasNextPage: hasNextTagPage,
+  } = trpc.useInfiniteQuery(["tags.getAllTags", {}], {
+    getNextPageParam: (lastPage) => lastPage.at(9)?.id,
+  });
+
   return (
     <>
       <Head>
@@ -116,10 +144,16 @@ const TagPageContentAnon: React.FC<{ name: string }> = ({ name }) => {
       </Head>
 
       <div className="container h-screen px-8 mx-auto">
-        <h1 className="text-4xl font-extrabold capitalize">{name}</h1>
-        <main className="flex flex-col items-center justify-center mt-8">
-          {recipePages ? (
-            <>
+        {recipePages && tagPages ? (
+          <>
+            <TagPageHeader
+              tagPages={tagPages}
+              fetchNextPage={fetchNextTagPage}
+              hasNextPage={hasNextTagPage}
+              isFetchingNextPage={isFetchingNextTagPage}
+              name={name}
+            />
+            <main className="flex flex-col items-center justify-center mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {recipePages.pages.map((recipes) =>
                   recipes.map((recipe) => {
@@ -142,11 +176,52 @@ const TagPageContentAnon: React.FC<{ name: string }> = ({ name }) => {
                   ""
                 )}
               </div>
-            </>
-          ) : (
-            <LoadingSpinner />
+            </main>
+          </>
+        ) : (
+          <LoadingSpinner />
+        )}
+      </div>
+    </>
+  );
+};
+
+const TagPageHeader: React.FC<{
+  name: string;
+  tagPages: InfiniteData<Tag[]>;
+  fetchNextPage: any;
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean | undefined;
+}> = ({ name, tagPages, fetchNextPage, isFetchingNextPage, hasNextPage }) => {
+  return (
+    <>
+      <h1 className="text-4xl font-extrabold capitalize">{name}</h1>
+      <div className="pt-6">
+        <p className="text-2xl font-bold pb-2">Other tags:</p>
+        <div className="flex gap-4 items-center flex-wrap">
+          {tagPages.pages.map((tags) =>
+            tags.map((tag) => {
+              return (
+                <p className="capitalize btn btn-outline" key={tag.id}>
+                  <Link href={"/tag/" + tag.name}>{tag.name}</Link>
+                </p>
+              );
+            })
           )}
-        </main>
+          {isFetchingNextPage ? (
+            <LoadingSpinner height="h-12" />
+          ) : hasNextPage ? (
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={!hasNextPage || isFetchingNextPage}
+              className="btn btn-ghost px-8 py-4 bg-base-200 rounded-xl"
+            >
+              Load More
+            </button>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     </>
   );

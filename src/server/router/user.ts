@@ -1,12 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createRouter } from "./context";
-import { recipeRouter } from "./recipe";
 
 export const userRouter = createRouter()
   .query("getUserDataById", {
     input: z.object({
-      id: z.string().min(1),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       const user = await ctx.prisma.user.findUnique({
@@ -22,7 +21,7 @@ export const userRouter = createRouter()
   })
   .query("getAllUserRecipes", {
     input: z.object({
-      id: z.string().min(1),
+      id: z.string(),
       cursor: z.string().nullish(),
     }),
     async resolve({ ctx, input }) {
