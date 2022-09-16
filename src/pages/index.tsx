@@ -1,13 +1,15 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   //const m = trpc.useMutation("recipe.insertTests");
-  //useEffect(() => {
-  //m.mutate();
-  //}, []);
+  const router = useRouter();
+  useEffect(() => {
+    // m.mutate();
+    router.push("/recipes");
+  }, []);
 
   return (
     <>

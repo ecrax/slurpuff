@@ -328,7 +328,7 @@ const RecipePageContent: React.FC<{
       ))}
     </div>
 
-    {recipe.notes ?? (
+    {recipe.notes && (
       <div className="pt-8">
         <i>~ {recipe.notes}</i>
       </div>
