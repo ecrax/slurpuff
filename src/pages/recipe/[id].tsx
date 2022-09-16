@@ -328,9 +328,11 @@ const RecipePageContent: React.FC<{
       ))}
     </div>
 
-    <div className="pt-8">
-      <i>~ {recipe.notes}</i>
-    </div>
+    {recipe.notes ?? (
+      <div className="pt-8">
+        <i>~ {recipe.notes}</i>
+      </div>
+    )}
 
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full mt-8">
       <div>
