@@ -51,7 +51,7 @@ const New: NextPage = () => {
         name: name.trim(),
         ingredients: ingredients.map((v) => v.trim()),
         steps: steps.map((v) => v.trim()),
-        tags: tags.map((v) => v.trim()),
+        tags: tags.map((v) => v.trim().toLowerCase()),
         image: uploadedImageUrl,
         timeRequired: durationMs,
         notes: notes.trim(),

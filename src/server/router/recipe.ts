@@ -59,6 +59,62 @@ export const recipeRouter = createRouter()
       return recipe;
     },
   })
+  .query("getAllWithTag", {
+    input: z.object({
+      tag: z.string(),
+      cursor: z.string().nullish(),
+    }),
+    resolve: async ({ input, ctx }) => {
+      let recipes;
+      if (!input.cursor) {
+        recipes = await ctx.prisma.recipe.findMany({
+          take: 9,
+          where: {
+            tags: {
+              some: {
+                name: input.tag,
+              },
+            },
+          },
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            rating: true,
+            steps: true,
+            tags: true,
+            timeRequired: true,
+          },
+        });
+      } else {
+        recipes = await ctx.prisma.recipe.findMany({
+          take: 9,
+          skip: 1,
+          cursor: {
+            id: input.cursor,
+          },
+          where: {
+            tags: {
+              some: {
+                name: input.tag,
+              },
+            },
+          },
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            rating: true,
+            steps: true,
+            tags: true,
+            timeRequired: true,
+          },
+        });
+      }
+
+      return recipes;
+    },
+  })
   .middleware(async ({ ctx, next }) => {
     // Any queries or mutations after this middleware will
     // raise an error unless there is a current session

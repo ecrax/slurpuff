@@ -15,6 +15,7 @@ import type { Recipe, Tag } from "@prisma/client";
 import Image from "next/image";
 import { uploadImage } from "../../../utils/uploadImage";
 import LoadingSpinner from "../../../components/LoadingSpinner";
+import capitalize from "../../../utils/capitalize";
 
 const Edit: NextPage = () => {
   const { query } = useRouter();
@@ -87,7 +88,7 @@ const EditContent: React.FC<{
   const [ingredients, setIngredients] = useState(oldRecipe.ingredients);
   const [steps, setSteps] = useState(oldRecipe.steps);
   const oldTagsAsStrings = oldRecipe.tags.map(({ name }) => name);
-  const [tags, setTags] = useState(oldTagsAsStrings);
+  const [tags, setTags] = useState(oldTagsAsStrings.map((t) => capitalize(t)));
   const [name, setName] = useState(oldRecipe.name);
   const [notes, setNotes] = useState(oldRecipe.notes);
   const [image, setImage] = useState<File>();
@@ -123,7 +124,7 @@ const EditContent: React.FC<{
           : steps.map((v) => v.trim()),
         tags: arrayIsEqual(tags, oldTagsAsStrings)
           ? undefined
-          : tags.map((v) => v.trim()),
+          : tags.map((v) => v.trim().toLowerCase()),
         oldTags: oldTagsAsStrings,
         image: !uploadedImageUrl ? undefined : uploadedImageUrl,
         timeRequired:

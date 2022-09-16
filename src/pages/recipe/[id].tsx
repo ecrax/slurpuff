@@ -302,8 +302,11 @@ const RecipePageContent: React.FC<{
       </span>
 
       {recipe.tags.map(({ name }) => (
-        <span className="badge badge-ghost mr-2" key={name + "_" + recipe.id}>
-          {name}
+        <span
+          className="badge badge-ghost mr-2 capitalize"
+          key={name + "_" + recipe.id}
+        >
+          <Link href={"/tag/" + name.toLowerCase()}>{name}</Link>
         </span>
       ))}
     </div>
