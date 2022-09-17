@@ -15,6 +15,7 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [ ] autocomplete on tags, when editing or creating
 - [ ] search
 - [ ] proper form checking and error feedback
+- [ ] planetscale?
 
 ### Optional Todos
 - [x] Global state management for application wide optimistic updates of saved recipes

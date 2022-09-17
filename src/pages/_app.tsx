@@ -73,7 +73,7 @@ export default withTRPC<AppRouter>({
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: true,
+  ssr: false,
   //responseMeta({ ctx, clientErrors }) {
   //  if (clientErrors.length) {
   //    // propagate http first error from API calls
