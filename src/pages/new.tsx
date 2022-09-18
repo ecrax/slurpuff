@@ -31,6 +31,7 @@ const New: NextPage = () => {
   const router = useRouter();
 
   const [createIsLoading, setCreateIsLoading] = useState(false);
+  const [ratingUi, setRatingUi] = useState(4);
 
   const { error: createError, mutateAsync: createRecipe } = trpc.useMutation([
     "recipe.create",
@@ -45,7 +46,7 @@ const New: NextPage = () => {
   } = useForm<IFormInput>({
     mode: "onBlur",
     defaultValues: {
-      rating: 5,
+      rating: 4,
       ingredients: [{ value: "" }],
       steps: [{ value: "" }],
       tags: [{ value: "" }],
@@ -145,6 +146,8 @@ const New: NextPage = () => {
                             key={`${i}_rating`}
                             className="mask mask-star-2 bg-primary"
                             value={i + 1}
+                            checked={i + 1 === ratingUi}
+                            onClick={() => setRatingUi(i + 1)}
                             {...register("rating")}
                           />
                         ))}
