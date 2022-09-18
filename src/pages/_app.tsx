@@ -6,8 +6,9 @@ import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 import Layout from "../components/Layout";
+import type { Session } from "next-auth";
 
-const MyApp: AppType = ({
+const MyApp: AppType<{ session: Session }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
