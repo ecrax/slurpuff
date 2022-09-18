@@ -13,7 +13,7 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] tags page
 - [x] landing page
 - [x] planetscale!
-- [ ] proper form checking and error feedback -> switch to hook form (https://react-hook-form.com/api/usefieldarray/)
+- [x] proper form checking and error feedback -> switch to hook form (https://react-hook-form.com/api/usefieldarray/)
 - [ ] autocomplete on tags, when editing or creating
 - [ ] display similar recipes (by tags) on recipe pages
 - [ ] search
