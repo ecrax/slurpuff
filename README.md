@@ -12,7 +12,7 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] refactor database to proper relational structure -> no more lists (easier tags search, clean deletion of recipes)
 - [x] tags page
 - [x] landing page
-- [ ] planetscale!
+- [x] planetscale!
 - [ ] proper form checking and error feedback -> switch to hook form (https://react-hook-form.com/api/usefieldarray/)
 - [ ] autocomplete on tags, when editing or creating
 - [ ] display similar recipes (by tags) on recipe pages
