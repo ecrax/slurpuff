@@ -27,3 +27,17 @@ export type RecipeWithTag = {
 } & {
   tags: Tag[];
 };
+
+export interface IFormInput {
+  name: String;
+  rating: number;
+  notes: string;
+  duration: {
+    minutes: number;
+    hours: number;
+  };
+  image: FileList;
+  steps: { value: string }[];
+  ingredients: { value: string }[];
+  tags: { value: string }[];
+}

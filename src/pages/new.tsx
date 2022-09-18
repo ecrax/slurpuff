@@ -11,24 +11,11 @@ import { useRouter } from "next/router";
 import { uploadImage } from "../utils/uploadImage";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { type SubmitHandler, useForm } from "react-hook-form";
-
-export interface IFormInput {
-  name: String;
-  rating: number;
-  notes: string;
-  duration: {
-    minutes: number;
-    hours: number;
-  };
-  image: FileList;
-  steps: { value: string }[];
-  ingredients: { value: string }[];
-  tags: { value: string }[];
-}
+import { IFormInput } from "../utils/recipe";
 
 const New: NextPage = () => {
   const { data: session, status } = useSession();
-  const router = useRouter();
+  //const router = useRouter();
 
   const [createIsLoading, setCreateIsLoading] = useState(false);
   const [ratingUi, setRatingUi] = useState(4);

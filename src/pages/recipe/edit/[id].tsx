@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import type { Session } from "next-auth";
 import type { RecipeWithTag } from "../../../utils/recipe";
+import type { IFormInput } from "../../../utils/recipe";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -9,13 +10,12 @@ import styles from "../../../styles/New.module.css";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { msToTime, toMiliseconds } from "../../../utils/time";
-import { ImageInput, NumberInput, TextInput } from "../../../components/Input";
 import DynamicInput from "../../../components/DynamicInput";
-import { FilledButton } from "../../../components/Button";
 import Image from "next/image";
 import { uploadImage } from "../../../utils/uploadImage";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import capitalize from "../../../utils/capitalize";
+import { type SubmitHandler, useForm } from "react-hook-form";
 
 const Edit: NextPage = () => {
   const { query } = useRouter();
@@ -75,33 +75,56 @@ const EditContent: React.FC<{
 }> = ({ session, oldRecipe }) => {
   const router = useRouter();
 
-  const {
-    isLoading: updateIsLoading,
-    error: updateError,
-    mutate: updateRecipe,
-  } = trpc.useMutation(["recipe.update"]);
+  const { error: updateError, mutateAsync: updateRecipe } = trpc.useMutation([
+    "recipe.update",
+  ]);
 
   const timeRequired = msToTime(oldRecipe.timeRequired);
 
-  const [ingredients, setIngredients] = useState(oldRecipe.ingredients);
-  const [steps, setSteps] = useState(oldRecipe.steps);
-  const oldTagsAsStrings = oldRecipe.tags.map(({ name }) => name);
-  const [tags, setTags] = useState(oldTagsAsStrings.map((t) => capitalize(t)));
-  const [name, setName] = useState(oldRecipe.name);
-  const [notes, setNotes] = useState(oldRecipe.notes);
-  const [image, setImage] = useState<File>();
-  const [rating, setRating] = useState(oldRecipe.rating);
-  const [duration, setDuration] = useState({
-    minutes: timeRequired.mins,
-    hours: timeRequired.hrs,
-  });
+  const [updateIsLoading, setUpdateIsLoading] = useState(false);
+  const [ratingUi, setRatingUi] = useState(oldRecipe.rating);
 
-  const handleUpdate = async () => {
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    control,
+  } = useForm<IFormInput>({
+    mode: "onBlur",
+    defaultValues: {
+      rating: oldRecipe.rating,
+      duration: {
+        hours: timeRequired.hrs,
+        minutes: timeRequired.mins,
+      },
+      notes: oldRecipe.notes as string | undefined,
+      name: oldRecipe.name,
+      ingredients: oldRecipe.ingredients.map((v) => ({
+        value: v,
+      })),
+      steps: oldRecipe.steps.map((v) => ({
+        value: v,
+      })),
+      tags: oldRecipe.tags.map((v) => ({
+        value: capitalize(v.name),
+      })),
+    },
+  });
+  const onSubmit: SubmitHandler<IFormInput> = (data) => handleUpdate(data);
+
+  const handleUpdate = async (data: IFormInput) => {
+    console.log(data);
+
     if (!session.user?.id) return;
+    setUpdateIsLoading(true);
+
+    const { image, duration, name, ingredients, steps, notes, rating, tags } =
+      data;
 
     let uploadedImageUrl: string | undefined;
-    if (image) {
-      uploadedImageUrl = await uploadImage(image);
+    if (image.length > 0) {
+      const img = image.item(0);
+      if (img) uploadedImageUrl = await uploadImage(img);
     }
 
     const durationMs = toMiliseconds(
@@ -110,20 +133,27 @@ const EditContent: React.FC<{
       0
     );
 
-    updateRecipe(
+    const transformedIngredients = ingredients.map((i) => i.value);
+    const transformedSteps = steps.map((i) => i.value);
+    const transformedTags = tags.map((i) => i.value);
+
+    await updateRecipe(
       {
         id: oldRecipe.id,
         name: name === oldRecipe.name ? undefined : name.trim(),
-        ingredients: arrayIsEqual(ingredients, oldRecipe.ingredients)
+        ingredients: arrayIsEqual(transformedIngredients, oldRecipe.ingredients)
           ? undefined
-          : ingredients.map((v) => v.trim()),
-        steps: arrayIsEqual(steps, oldRecipe.steps)
+          : transformedIngredients.map((v) => v.trim()),
+        steps: arrayIsEqual(transformedSteps, oldRecipe.steps)
           ? undefined
-          : steps.map((v) => v.trim()),
-        tags: arrayIsEqual(tags, oldTagsAsStrings)
+          : transformedSteps.map((v) => v.trim()),
+        tags: arrayIsEqual(
+          transformedTags,
+          oldRecipe.tags.map(({ name }) => name)
+        )
           ? undefined
-          : tags.map((v) => v.trim().toLowerCase()),
-        oldTags: oldTagsAsStrings,
+          : transformedTags.map((v) => v.trim().toLowerCase()),
+        oldTags: oldRecipe.tags.map(({ name }) => name),
         image: !uploadedImageUrl ? undefined : uploadedImageUrl,
         timeRequired:
           durationMs === oldRecipe.timeRequired ? undefined : durationMs,
@@ -137,12 +167,13 @@ const EditContent: React.FC<{
         },
       }
     );
+    setUpdateIsLoading(false);
   };
 
   return (
     <>
       <Head>
-        <title>Edit recipe: {name}</title>
+        <title>Edit recipe: {oldRecipe.name}</title>
         <meta name="description" content="Generated by create-t3-app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -150,20 +181,23 @@ const EditContent: React.FC<{
       <div className="container h-screen px-8 mx-auto">
         <div className="flex flex-col items-center justify-center">
           <main className="w-full prose">
-            <form
-              className="flex flex-col"
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-            >
+            <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
               <div className="py-2">
                 <label>
                   <h3>Name</h3>
-                  <TextInput
-                    name="name"
+                  {errors.name && (
+                    <p className="text-red-500">{errors.name.message}</p>
+                  )}
+                  <input
+                    type="text"
                     placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    className="w-full input input-bordered"
+                    {...register("name", {
+                      required: {
+                        message: "Enter a name",
+                        value: true,
+                      },
+                    })}
                   />
                 </label>
               </div>
@@ -174,11 +208,12 @@ const EditContent: React.FC<{
                     {Array.from({ length: 5 }, (_, i) => (
                       <input
                         type="radio"
-                        name="rating-9"
                         key={`${i}_rating`}
                         className="mask mask-star-2 bg-primary"
-                        checked={rating === i + 1}
-                        onChange={() => setRating(i + 1)}
+                        value={i + 1}
+                        checked={i + 1 === ratingUi}
+                        onClick={() => setRatingUi(i + 1)}
+                        {...register("rating", { valueAsNumber: true })}
                       />
                     ))}
                   </div>
@@ -187,11 +222,11 @@ const EditContent: React.FC<{
               <div className="py-2">
                 <label>
                   <h3>Notes</h3>
-                  <TextInput
-                    name="notes"
+                  <input
+                    type="text"
                     placeholder="Notes"
-                    value={notes ?? ""}
-                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full input input-bordered"
+                    {...register("notes", { required: false })}
                   />
                 </label>
               </div>
@@ -205,101 +240,131 @@ const EditContent: React.FC<{
                     alt={oldRecipe.name}
                     objectFit="cover"
                   />
-                  <ImageInput
-                    name="image"
-                    onChange={(e) => {
-                      //not nice but i dont know ts
-                      setImage(e.target.files![0]);
-                    }}
+                  {errors.image && (
+                    <p className="text-red-500">{errors.image.message}</p>
+                  )}
+                  <input
+                    {...register("image", {
+                      required: false,
+                    })}
+                    accept=".jpg, .png, .jpeg"
+                    type="file"
+                    className="block w-full border rounded-lg cursor-pointer file:hover:border-r-base-100 file:mr-2 file:border-base-100 border-base-300 file:hover:bg-transparent file:border-r-1 file:border-l-0 file:border-t-0 file:border-b-0 file:rounded-none file:btn file:bg-transparent file:text-neutral bg-inherit"
                   />
                 </label>
               </div>
               <div className="py-2">
                 <label className={styles.inputGroupVerticalCustom}>
                   <h3>Time required</h3>
-                  <NumberInput
+                  {errors.duration && (
+                    <p className="text-red-500">
+                      {errors.duration.hours?.message}
+                    </p>
+                  )}
+                  {errors.duration && (
+                    <p className="text-red-500">
+                      {errors.duration.minutes?.message}
+                    </p>
+                  )}
+                  <input
+                    type="number"
                     placeholder="Hours"
-                    name="hours"
-                    min={0}
-                    step="1"
-                    value={duration.hours}
-                    onChange={(e) => {
-                      const num = Number.parseInt(e.target.value);
-                      if (!Number.isInteger(num)) {
-                        setDuration({
-                          minutes: duration.minutes,
-                          hours: Math.round(num),
-                        });
-                        return;
-                      }
-
-                      if (num < 0) {
-                        setDuration({ minutes: duration.minutes, hours: 0 });
-                        return;
-                      }
-
-                      setDuration((_d) => ({
-                        minutes: _d.minutes,
-                        hours: num,
-                      }));
-                    }}
+                    step={1}
+                    className="w-full input input-bordered"
+                    {...register("duration.hours", {
+                      required: {
+                        message: "Enter Hours",
+                        value: true,
+                      },
+                      valueAsNumber: true,
+                      min: {
+                        value: 0,
+                        message: "Please enter hours more than 0",
+                      },
+                    })}
                   />
-                  <NumberInput
+                  <input
+                    type="number"
                     placeholder="Minutes"
-                    name="minutes"
-                    max={59}
-                    min={0}
-                    step="1"
-                    value={duration.minutes}
-                    onChange={(e) => {
-                      const num = Number.parseInt(e.target.value);
-
-                      if (num > 59) {
-                        setDuration({ minutes: 59, hours: duration.hours });
-                        return;
-                      }
-
-                      if (!Number.isInteger(num)) {
-                        setDuration({
-                          hours: duration.hours,
-                          minutes: Math.round(num),
-                        });
-                        return;
-                      }
-
-                      setDuration((_d) => ({
-                        hours: _d.hours,
-                        minutes: num,
-                      }));
-                    }}
+                    className="w-full input input-bordered"
+                    step={1}
+                    {...register("duration.minutes", {
+                      required: {
+                        message: "Enter Minutes",
+                        value: true,
+                      },
+                      valueAsNumber: true,
+                      min: {
+                        value: 0,
+                        message: "Please enter minutes between 0 and 59",
+                      },
+                      max: {
+                        value: 59,
+                        message: "Please enter minutes between 0 and 59",
+                      },
+                    })}
                   />
                 </label>
               </div>
               <div className="py-2">
+                <label>
+                  <h3>Ingredients</h3>
+                </label>
+                {errors.ingredients &&
+                  Array.isArray(errors.ingredients) &&
+                  errors.ingredients.length > 0 && (
+                    <p className="text-red-500">Fill or delete empty fields</p>
+                  )}
                 <DynamicInput
-                  setState={setIngredients}
-                  state={ingredients}
-                  name={"Ingredients"}
+                  register={register}
+                  control={control}
+                  name={"ingredients"}
                 />
               </div>
               <div className="py-2">
+                <label>
+                  <h3>Steps</h3>
+                </label>
+                {errors.steps &&
+                  Array.isArray(errors.steps) &&
+                  errors.steps.length > 0 && (
+                    <p className="text-red-500">Fill or delete empty fields</p>
+                  )}
                 <DynamicInput
-                  setState={setSteps}
-                  state={steps}
-                  name={"Steps"}
+                  register={register}
+                  control={control}
+                  name={"steps"}
                 />
               </div>
               <div className="py-2">
-                <DynamicInput setState={setTags} state={tags} name={"Tags"} />
+                <label>
+                  <h3>Tags</h3>
+                </label>
+
+                {errors.tags?.message}
+                {errors.tags &&
+                  Array.isArray(errors.tags) &&
+                  errors.tags.length > 0 && (
+                    <p className="text-red-500">Fill or delete empty fields</p>
+                  )}
+
+                <DynamicInput
+                  register={register}
+                  control={control}
+                  name={"tags"}
+                />
               </div>
               <div className="py-2">
-                <FilledButton
+                <button
+                  type="submit"
+                  className="btn btn-primary"
                   disabled={updateIsLoading}
-                  onClick={handleUpdate}
-                  icon={<PlusIcon />}
                 >
-                  Update
-                </FilledButton>
+                  <div className="w-5 h-5 mr-2 -ml-1">
+                    <PlusIcon />
+                  </div>
+                  {updateIsLoading ? "Loading..." : "Update"}
+                </button>
               </div>
               <p className="py-2">
                 {updateError?.message ? updateError.message : ""}

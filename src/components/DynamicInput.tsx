@@ -4,7 +4,7 @@ import {
   type Control,
   type UseFormRegister,
 } from "react-hook-form";
-import type { IFormInput } from "../pages/new";
+import type { IFormInput } from "../utils/recipe";
 import capitalize from "../utils/capitalize";
 
 const DynamicInput: React.FC<{
