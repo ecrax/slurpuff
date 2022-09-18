@@ -1,5 +1,7 @@
+import type { Tag } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { RecipeWithTag } from "../../utils/recipe";
 import { createRouter } from "./context";
 
 export const userRouter = createRouter()
@@ -42,7 +44,7 @@ export const userRouter = createRouter()
         });
       }
 
-      return recipes;
+      return recipes as RecipeWithTag[];
     },
   })
   .middleware(async ({ ctx, next }) => {

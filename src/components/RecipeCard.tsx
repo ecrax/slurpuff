@@ -10,18 +10,10 @@ import type { Session } from "next-auth";
 import { trpc } from "../utils/trpc";
 import { useAtom } from "jotai";
 import { savedRecipesAtom } from "../utils/atoms";
-import type { Tag } from "@prisma/client";
+import type { RecipeForCard } from "../utils/recipe";
 
 const RecipeCard: React.FC<{
-  recipe: {
-    id: string;
-    image: string;
-    name: string;
-    rating: number;
-    steps: string[];
-    tags: Tag[];
-    timeRequired: number;
-  };
+  recipe: RecipeForCard;
   session?: Session | null;
   dropdown?: boolean;
 }> = ({ recipe, dropdown = false, session }) => {
@@ -37,15 +29,7 @@ const RecipeCard: React.FC<{
 };
 
 const RecipeCardAnon: React.FC<{
-  recipe: {
-    id: string;
-    image: string;
-    name: string;
-    rating: number;
-    steps: string[];
-    tags: Tag[];
-    timeRequired: number;
-  };
+  recipe: RecipeForCard;
   dropdown?: boolean;
 }> = ({ recipe, dropdown }) => {
   return (
@@ -98,15 +82,7 @@ const RecipeCardAnon: React.FC<{
   );
 };
 const RecipeCardLoggedIn: React.FC<{
-  recipe: {
-    id: string;
-    image: string;
-    name: string;
-    rating: number;
-    steps: string[];
-    tags: Tag[];
-    timeRequired: number;
-  };
+  recipe: RecipeForCard;
   session: Session;
   dropdown?: boolean;
 }> = ({ recipe, dropdown = false, session }) => {
@@ -203,15 +179,7 @@ const RecipeCardLoggedIn: React.FC<{
 export default RecipeCard;
 
 const CardTabs: React.FC<{
-  recipe: {
-    id: string;
-    image: string;
-    name: string;
-    rating: number;
-    steps: string[];
-    tags: Tag[];
-    timeRequired: number;
-  };
+  recipe: RecipeForCard;
 }> = ({ recipe }) => (
   <div className="card-actions">
     <p className="badge badge-primary">

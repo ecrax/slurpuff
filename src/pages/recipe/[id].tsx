@@ -1,12 +1,12 @@
+import type { RecipeWithTag } from "../../utils/recipe";
+import type { NextPage } from "next";
+import type { Session } from "next-auth";
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/outline";
 import {
   BookmarkIcon as BookmarkIconSolid,
   ChevronDownIcon,
 } from "@heroicons/react/solid";
-import type { Recipe, Tag, User } from "@prisma/client";
 import { useAtom } from "jotai";
-import type { NextPage } from "next";
-import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
@@ -70,6 +70,7 @@ const RecipePageContentAnon: React.FC<{ id: string }> = ({ id }) => {
                 objectFit="cover"
                 layout="fill"
                 priority
+                quality={90}
               />
             </div>
 
@@ -143,6 +144,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: string; session: Session }> = ({
                 objectFit="cover"
                 layout="fill"
                 priority
+                quality={90}
               />
             </div>
 
@@ -276,9 +278,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: string; session: Session }> = ({
 
 const RecipePageContent: React.FC<{
   user: { id: string; name: string };
-  recipe: Recipe & {
-    tags: Tag[];
-  };
+  recipe: RecipeWithTag;
   currentUserId?: string | undefined;
 }> = ({ recipe, user, currentUserId }) => (
   <>

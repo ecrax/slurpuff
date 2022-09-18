@@ -1,3 +1,4 @@
+import type { RecipeForCard, RecipeWithTag } from "../../utils/recipe";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createRouter } from "./context";
@@ -39,7 +40,7 @@ export const recipeRouter = createRouter()
         });
       }
 
-      return recipes;
+      return recipes as RecipeForCard[];
     },
   })
   .query("getById", {
@@ -56,7 +57,7 @@ export const recipeRouter = createRouter()
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      return recipe;
+      return recipe as RecipeWithTag;
     },
   })
   .query("getAllWithTag", {
@@ -112,7 +113,7 @@ export const recipeRouter = createRouter()
         });
       }
 
-      return recipes;
+      return recipes as RecipeForCard[];
     },
   })
   .middleware(async ({ ctx, next }) => {

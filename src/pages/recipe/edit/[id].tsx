@@ -1,4 +1,6 @@
 import type { NextPage } from "next";
+import type { Session } from "next-auth";
+import type { RecipeWithTag } from "../../../utils/recipe";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -10,8 +12,6 @@ import { msToTime, toMiliseconds } from "../../../utils/time";
 import { ImageInput, NumberInput, TextInput } from "../../../components/Input";
 import DynamicInput from "../../../components/DynamicInput";
 import { FilledButton } from "../../../components/Button";
-import type { Session } from "next-auth";
-import type { Recipe, Tag } from "@prisma/client";
 import Image from "next/image";
 import { uploadImage } from "../../../utils/uploadImage";
 import LoadingSpinner from "../../../components/LoadingSpinner";
@@ -71,9 +71,7 @@ const arrayIsEqual = (array1: string[], array2: string[]) => {
 
 const EditContent: React.FC<{
   session: Session;
-  oldRecipe: Recipe & {
-    tags: Tag[];
-  };
+  oldRecipe: RecipeWithTag;
 }> = ({ session, oldRecipe }) => {
   const router = useRouter();
 

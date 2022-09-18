@@ -1,13 +1,12 @@
 import type { Recipe, Tag, User } from "@prisma/client";
 import type { Session } from "next-auth";
+import type { RecipeWithTag } from "../utils/recipe";
 import { savedRecipesAtom } from "../utils/atoms";
 import RecipeCard from "./RecipeCard";
 import { useAtom } from "jotai";
 
 const SavedRecipes: React.FC<{
-  recipes: (Recipe & {
-    tags: Tag[];
-  })[];
+  recipes: RecipeWithTag[];
   user: User;
   session: Session;
 }> = ({ recipes, session, user }) => {

@@ -11,16 +11,16 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] Pagination for all pages where multiple recipes are displayed
 - [x] refactor database to proper relational structure -> no more lists (easier tags search, clean deletion of recipes)
 - [x] tags page
-- [ ] landing page
+- [x] landing page
+- [ ] planetscale!
+- [ ] proper form checking and error feedback -> switch to hook form (https://react-hook-form.com/api/usefieldarray/)
 - [ ] autocomplete on tags, when editing or creating
-- [ ] search
-- [ ] proper form checking and error feedback
-- [ ] generate share images for recipes
 - [ ] display similar recipes (by tags) on recipe pages
-- [ ] planetscale?
+- [ ] search
+- [ ] generate share images for recipes
 
 ### Optional Todos
 - [x] Global state management for application wide optimistic updates of saved recipes
 
 ## DB
-Railway Postgres
+Planetscale DB
