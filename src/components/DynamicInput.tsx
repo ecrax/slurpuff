@@ -1,55 +1,79 @@
-import type { Dispatch, SetStateAction } from "react";
-import { OutlineButton } from "./Button";
-import { TextInput } from "./Input";
 import { PlusIcon, MinusIcon } from "@heroicons/react/solid";
+import {
+  useFieldArray,
+  type Control,
+  type UseFormRegister,
+} from "react-hook-form";
+import type { IFormInput } from "../pages/new";
+import capitalize from "../utils/capitalize";
 
 const DynamicInput: React.FC<{
-  setState: Dispatch<SetStateAction<string[]>>;
-  state: string[];
-  name: string;
-}> = ({ setState, state, name }) => {
+  name: "steps" | "tags" | "ingredients";
+  control: Control<IFormInput, any>;
+  register: UseFormRegister<IFormInput>;
+}> = ({ name, control, register }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name,
+    rules: {
+      required: {
+        message: "Enter " + capitalize(name),
+        value: true,
+      },
+      minLength: 1,
+    },
+  });
+
   return (
-    <label>
-      <h3>{name}</h3>
-      {state.map((_field, i) => (
-        <div key={`${i}_${name}`}>
-          <TextInput
-            name="dynamicInput"
-            value={state[i]}
-            placeholder={`${i + 1}. ${name.slice(0, -1)}`}
-            onChange={(e) => {
-              const _state = [...state];
-              _state[i] = e.target.value;
-              setState(_state);
-            }}
-          />
+    <>
+      {fields.map((field, i) => (
+        <div key={field.id}>
+          <div className="flex">
+            <input
+              type="text"
+              placeholder={`${i + 1}. ${capitalize(name).slice(0, -1)}`}
+              className={
+                "w-full input input-bordered " +
+                (fields.length > 1 ? "rounded-l-lg rounded-r-none" : "")
+              }
+              {...register(`${name}.${i}.value` as const, {
+                required: {
+                  message: "Fill or delete empty fields",
+                  value: true,
+                },
+              })}
+            />
+            {fields.length > 1 && (
+              <button
+                className="btn btn-outline rounded-r-lg rounded-l-none"
+                type="button"
+                onClick={() => remove(i)}
+              >
+                <div className="w-5 h-5">
+                  <MinusIcon />
+                </div>
+              </button>
+            )}
+          </div>
+
           <div className="h-2" />
 
-          <div className={state.length > 1 ? "btn-group" : ""}>
-            {i === state.length - 1 && (
-              <OutlineButton
-                icon={<PlusIcon />}
-                onClick={() => {
-                  setState([...state, ""]);
-                }}
-              />
-            )}
-            {state.length !== 1 && i === state.length - 1 && (
-              <OutlineButton
-                icon={<MinusIcon />}
-                onClick={() => {
-                  const _state = [...state];
-
-                  _state.splice(i, 1);
-
-                  setState(_state);
-                }}
-              />
+          <div>
+            {i === fields.length - 1 && (
+              <button
+                className="btn btn-outline"
+                type="button"
+                onClick={() => append({ value: "" })}
+              >
+                <div className="w-5 h-5">
+                  <PlusIcon />
+                </div>
+              </button>
             )}
           </div>
         </div>
       ))}
-    </label>
+    </>
   );
 };
 
