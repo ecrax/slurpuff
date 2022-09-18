@@ -15,6 +15,8 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [ ] autocomplete on tags, when editing or creating
 - [ ] search
 - [ ] proper form checking and error feedback
+- [ ] generate share images for recipes
+- [ ] display similar recipes (by tags) on recipe pages
 - [ ] planetscale?
 
 ### Optional Todos
