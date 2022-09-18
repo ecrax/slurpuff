@@ -30,9 +30,9 @@ const CategoriesPage: NextPage = () => {
               tagPages.pages.map((tags) =>
                 tags.map((tag) => {
                   return (
-                    <p className="capitalize btn btn-outline" key={tag.id}>
-                      <Link href={"/tag/" + tag.name}>{tag.name}</Link>
-                    </p>
+                    <Link href={"/tag/" + tag.name} key={tag.id}>
+                      <p className="capitalize btn btn-outline">{tag.name}</p>
+                    </Link>
                   );
                 })
               )

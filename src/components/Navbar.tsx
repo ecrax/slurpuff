@@ -40,9 +40,9 @@ const Navbar = () => {
             </div>
           </div>
           <div className="items-center hidden md:flex">
-            <div className="text-xl normal-case btn btn-ghost">
-              <Link href="/recipes">recipes</Link>
-            </div>
+            <Link href="/recipes">
+              <div className="text-xl normal-case btn btn-ghost">recipes</div>
+            </Link>
           </div>
         </div>
         <div className="hidden md:flex w-full mx-10 lg:mx-24">
