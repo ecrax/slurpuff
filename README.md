@@ -14,10 +14,11 @@ This is an app bootstrapped according to the [init.tips](https://init.tips) stac
 - [x] landing page
 - [x] planetscale!
 - [x] proper form checking and error feedback -> switch to hook form (https://react-hook-form.com/api/usefieldarray/)
-- [ ] autocomplete on tags, when editing or creating
-- [ ] display similar recipes (by tags) on recipe pages
-- [ ] search
+- [x] display similar recipes (by tags) on recipe pages
+- [ ] protion adjust (x0.5, x2)
 - [ ] generate share images for recipes
+- [ ] autocomplete on tags, when editing or creating
+- [ ] search
 
 ### Optional Todos
 - [x] Global state management for application wide optimistic updates of saved recipes

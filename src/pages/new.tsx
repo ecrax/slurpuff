@@ -7,7 +7,6 @@ import { trpc } from "../utils/trpc";
 import { toMiliseconds } from "../utils/time";
 import { PlusIcon } from "@heroicons/react/solid";
 import styles from "../styles/New.module.css";
-import { useRouter } from "next/router";
 import { uploadImage } from "../utils/uploadImage";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -33,7 +32,7 @@ const New: NextPage = () => {
   } = useForm<IFormInput>({
     mode: "onBlur",
     defaultValues: {
-      rating: 4,
+      rating: "4",
       ingredients: [{ value: "" }],
       steps: [{ value: "" }],
       tags: [{ value: "" }],
@@ -70,7 +69,7 @@ const New: NextPage = () => {
         image: uploadedImageUrl,
         timeRequired: durationMs,
         notes: notes.trim(),
-        rating: rating,
+        rating: Number.parseInt(rating),
       },
       {
         onSuccess() {

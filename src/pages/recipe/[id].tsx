@@ -17,6 +17,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { savedRecipesAtom } from "../../utils/atoms";
 import { msToTimeString } from "../../utils/time";
 import { trpc } from "../../utils/trpc";
+import RecipeCard from "../../components/RecipeCard";
 
 const RecipePage: NextPage = () => {
   const { query } = useRouter();
@@ -264,6 +265,7 @@ const RecipePageContentLoggedIn: React.FC<{ id: string; session: Session }> = ({
                   user={{ id: user.id, name: user.name ?? "" }}
                   recipe={recipe}
                   currentUserId={session.user?.id}
+                  session={session}
                 />
               </div>
             </main>
@@ -280,83 +282,136 @@ const RecipePageContent: React.FC<{
   user: { id: string; name: string };
   recipe: RecipeWithTag;
   currentUserId?: string | undefined;
-}> = ({ recipe, user, currentUserId }) => (
-  <>
-    <div className="flex">
-      <Link
-        href={
-          currentUserId === recipe.authorId ? "/user/me" : `/user/${user.id}`
-        }
-      >
-        <p className="link">by {user.name}</p>
-      </Link>
-    </div>
-    <div className="">
-      <span className="badge badge-primary mr-2">
-        {recipe.steps.length} Step
-        {recipe.steps.length > 1 ? "s" : ""}
-      </span>
+  session?: Session | undefined;
+}> = ({ recipe, user, currentUserId, session }) => {
+  const {
+    data: recipePages,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = trpc.useInfiniteQuery(
+    ["recipe.getAllWithTags", { tags: recipe.tags.map((r) => r.name) }],
+    {
+      getNextPageParam: (lastPage) => lastPage.at(8)?.id,
+    }
+  );
 
-      <span className="badge badge-primary mr-2">
-        {msToTimeString(recipe.timeRequired)}
-      </span>
-
-      {recipe.tags.map(({ name }) => (
-        <span
-          className="badge badge-ghost mr-2 capitalize"
-          key={name + "_" + recipe.id}
+  return (
+    <>
+      <div className="flex">
+        <Link
+          href={
+            currentUserId === recipe.authorId ? "/user/me" : `/user/${user.id}`
+          }
         >
-          <Link href={"/tag/" + name.toLowerCase()}>{name}</Link>
+          <p className="link">by {user.name}</p>
+        </Link>
+      </div>
+      <div className="">
+        <span className="badge badge-primary mr-2">
+          {recipe.steps.length} Step
+          {recipe.steps.length > 1 ? "s" : ""}
         </span>
-      ))}
-    </div>
 
-    <div className="pt-4 rating">
-      {Array.from({ length: 5 }, (_, i) => (
-        <input
-          type="radio"
-          name="rating-9"
-          className="mask mask-star-2 bg-primary"
-          style={{
-            transform: "none",
-            animation: "none",
-          }}
-          checked={recipe.rating === i + 1}
-          readOnly
-          key={`${i}_rating`}
-        />
-      ))}
-    </div>
+        <span className="badge badge-primary mr-2">
+          {msToTimeString(recipe.timeRequired)}
+        </span>
 
-    {recipe.notes && (
-      <div className="pt-8">
-        <i>~ {recipe.notes}</i>
-      </div>
-    )}
-
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full mt-8">
-      <div>
-        <h2>Ingredients</h2>
-        {recipe.ingredients.map((ingr) => (
-          <div key={ingr}>
-            <span className="font-bold">
-              {ingr.substring(0, ingr.indexOf(" "))}
-            </span>{" "}
-            <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
-          </div>
+        {recipe.tags.map(({ name }) => (
+          <span
+            className="badge badge-ghost mr-2 capitalize"
+            key={name + "_" + recipe.id}
+          >
+            <Link href={"/tag/" + name.toLowerCase()}>{name}</Link>
+          </span>
         ))}
       </div>
-      <div className="col-span-2">
-        <h2>Steps</h2>
-        {recipe.steps.map((s, i) => (
-          <div key={s}>
-            <span className="font-bold">{i + 1}.</span>
-            {" " + s}
-          </div>
+
+      <div className="pt-4 rating">
+        {Array.from({ length: 5 }, (_, i) => (
+          <input
+            type="radio"
+            name="rating-9"
+            className="mask mask-star-2 bg-primary"
+            style={{
+              transform: "none",
+              animation: "none",
+            }}
+            checked={recipe.rating === i + 1}
+            readOnly
+            key={`${i}_rating`}
+          />
         ))}
       </div>
-    </div>
-  </>
-);
+
+      {recipe.notes && (
+        <div className="pt-8">
+          <i>~ {recipe.notes}</i>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full mt-8">
+        <div>
+          <h2>Ingredients</h2>
+          {recipe.ingredients.map((ingr) => (
+            <div key={ingr}>
+              <span className="font-bold">
+                {ingr.substring(0, ingr.indexOf(" "))}
+              </span>{" "}
+              <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+            </div>
+          ))}
+        </div>
+        <div className="col-span-2">
+          <h2>Steps</h2>
+          {recipe.steps.map((s, i) => (
+            <div key={s}>
+              <span className="font-bold">{i + 1}.</span>
+              {" " + s}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="pt-4">
+        <h2>Similar Recipes</h2>
+
+        {recipePages ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+              {recipePages.pages.map((recipes) =>
+                recipes.map((recipe) => {
+                  return (
+                    <RecipeCard
+                      recipe={recipe}
+                      key={recipe.id}
+                      session={session}
+                    />
+                  );
+                })
+              )}
+            </div>
+            <div className="mb-8 px-8 py-4 my-16">
+              {isFetchingNextPage ? (
+                <LoadingSpinner height="mb-8 h-full" />
+              ) : hasNextPage ? (
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={!hasNextPage || isFetchingNextPage}
+                  className="mb-8 px-8 py-4 bg-base-200 rounded-xl"
+                >
+                  Load More
+                </button>
+              ) : (
+                ""
+              )}
+            </div>
+          </>
+        ) : (
+          <LoadingSpinner />
+        )}
+      </div>
+    </>
+  );
+};
 
 export default RecipePage;

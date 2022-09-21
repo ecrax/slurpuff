@@ -92,7 +92,7 @@ const EditContent: React.FC<{
   } = useForm<IFormInput>({
     mode: "onBlur",
     defaultValues: {
-      rating: oldRecipe.rating,
+      rating: oldRecipe.rating.toString(),
       duration: {
         hours: timeRequired.hrs,
         minutes: timeRequired.mins,
@@ -158,7 +158,10 @@ const EditContent: React.FC<{
         timeRequired:
           durationMs === oldRecipe.timeRequired ? undefined : durationMs,
         notes: notes === oldRecipe.notes ? undefined : notes?.trim(),
-        rating: rating === oldRecipe.rating ? undefined : rating,
+        rating:
+          Number.parseInt(rating) === oldRecipe.rating
+            ? undefined
+            : Number.parseInt(rating),
       },
       {
         onSuccess() {
@@ -213,7 +216,7 @@ const EditContent: React.FC<{
                         value={i + 1}
                         checked={i + 1 === ratingUi}
                         onClick={() => setRatingUi(i + 1)}
-                        {...register("rating", { valueAsNumber: true })}
+                        {...register("rating")}
                       />
                     ))}
                   </div>

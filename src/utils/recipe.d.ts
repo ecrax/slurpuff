@@ -29,8 +29,8 @@ export type RecipeWithTag = {
 };
 
 export interface IFormInput {
-  name: String;
-  rating: number;
+  name: string;
+  rating: string;
   notes: string;
   duration: {
     minutes: number;

@@ -105,7 +105,6 @@ const RecipeCardLoggedIn: React.FC<{
         <div className="px-2 pt-0 pb-2 card-body">
           <div className="flex items-baseline justify-between">
             <h2 className="card-title">{recipe.name}</h2>
-
             <div>
               {session && (
                 <div
@@ -189,7 +188,7 @@ const CardTabs: React.FC<{
 
     <p className="badge badge-primary">{msToTimeString(recipe.timeRequired)}</p>
 
-    <div className="badge badge-ghost rating rating-sm">
+    <div className="badge badge-ghost rating rating-sm my-auto">
       {Array.from(
         {
           length: 5,
