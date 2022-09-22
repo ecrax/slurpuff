@@ -1,5 +1,8 @@
 import type { NextPage } from "next";
-import DynamicInput from "./../components/DynamicInput";
+import {
+  DynamicInput,
+  DynamicInputWithAutocomplete,
+} from "./../components/DynamicInput";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
@@ -271,7 +274,7 @@ const New: NextPage = () => {
                         </p>
                       )}
 
-                    <DynamicInput
+                    <DynamicInputWithAutocomplete
                       register={register}
                       control={control}
                       name={"tags"}

@@ -213,6 +213,17 @@ export const recipeRouter = createRouter()
     }
     return next();
   })
+  .query("getAllTagsName", {
+    resolve: async ({ ctx }) => {
+      const tags = await ctx.prisma.tag.findMany({
+        select: {
+          name: true,
+        },
+      });
+
+      return tags.map((t) => t.name);
+    },
+  })
   .mutation("create", {
     input: z.object({
       name: z.string(),
