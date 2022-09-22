@@ -15,7 +15,7 @@ datasource db {
 model Recipe {
     id           String   @id @default(cuid())
     image        String
-    name         String   @unique
+    name         String   
     ingredients  Json
     steps        Json
     timeRequired Int
