@@ -75,9 +75,11 @@ const RecipePageContentAnon: React.FC<{ id: string }> = ({ id }) => {
               />
             </div>
 
-            <main className="flex flex-col items-center justify-center w-full pb-16 prose max-w-none ">
+            <main className="flex flex-col items-center justify-center w-full pb-16 max-w-none">
               <div className="w-full">
-                <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                <div className="prose">
+                  <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                </div>
                 <RecipePageContent
                   recipe={recipe}
                   user={{ id: user.id, name: user.name ?? "" }}
@@ -149,10 +151,12 @@ const RecipePageContentLoggedIn: React.FC<{ id: string; session: Session }> = ({
               />
             </div>
 
-            <main className="flex flex-col items-center justify-center w-full pb-16 prose max-w-none ">
+            <main className="flex flex-col items-center justify-center w-full pb-16 max-w-none">
               <div className="w-full">
                 <div className="flex flex-row justify-between md:justify-start items-baseline">
-                  <h1 className="pt-8 mb-2">{recipe.name}</h1>{" "}
+                  <div className="prose">
+                    <h1 className="pt-8 mb-2">{recipe.name}</h1>
+                  </div>
                   <div className="md:pl-4 flex flex-col md:flex-row justify-center items-center">
                     {session && (
                       <div
@@ -290,117 +294,126 @@ const RecipePageContent: React.FC<{
     isFetchingNextPage,
     hasNextPage,
   } = trpc.useInfiniteQuery(
-    ["recipe.getAllWithTags", { tags: recipe.tags.map((r) => r.name) }],
+    [
+      "recipe.getAllWithTags",
+      { tags: recipe.tags.map((r) => r.name), currentRecipeId: recipe.id },
+    ],
     {
-      getNextPageParam: (lastPage) => lastPage.at(8)?.id,
+      getNextPageParam: (lastPage) => lastPage.at(5)?.id,
     }
   );
 
   return (
     <>
-      <div className="flex">
-        <Link
-          href={
-            currentUserId === recipe.authorId ? "/user/me" : `/user/${user.id}`
-          }
-        >
-          <p className="link">by {user.name}</p>
-        </Link>
-      </div>
-      <div className="">
-        <span className="badge badge-primary mr-2">
-          {recipe.steps.length} Step
-          {recipe.steps.length > 1 ? "s" : ""}
-        </span>
+      <div className="prose max-w-none">
+        <div className="w-full">
+          <div className="flex">
+            <Link
+              href={
+                currentUserId === recipe.authorId
+                  ? "/user/me"
+                  : `/user/${user.id}`
+              }
+            >
+              <p className="link">by {user.name}</p>
+            </Link>
+          </div>
+          <div className="">
+            <span className="badge badge-primary mr-2">
+              {recipe.steps.length} Step
+              {recipe.steps.length > 1 ? "s" : ""}
+            </span>
 
-        <span className="badge badge-primary mr-2">
-          {msToTimeString(recipe.timeRequired)}
-        </span>
+            <span className="badge badge-primary mr-2">
+              {msToTimeString(recipe.timeRequired)}
+            </span>
 
-        {recipe.tags.map(({ name }) => (
-          <span
-            className="badge badge-ghost mr-2 capitalize"
-            key={name + "_" + recipe.id}
-          >
-            <Link href={"/tag/" + name.toLowerCase()}>{name}</Link>
-          </span>
-        ))}
-      </div>
+            {recipe.tags.map(({ name }) => (
+              <span
+                className="badge badge-ghost mr-2 capitalize"
+                key={name + "_" + recipe.id}
+              >
+                <Link href={"/tag/" + name.toLowerCase()}>{name}</Link>
+              </span>
+            ))}
+          </div>
 
-      <div className="pt-4 rating">
-        {Array.from({ length: 5 }, (_, i) => (
-          <input
-            type="radio"
-            name="rating-9"
-            className="mask mask-star-2 bg-primary"
-            style={{
-              transform: "none",
-              animation: "none",
-            }}
-            checked={recipe.rating === i + 1}
-            readOnly
-            key={`${i}_rating`}
-          />
-        ))}
-      </div>
+          <div className="pt-4 rating">
+            {Array.from({ length: 5 }, (_, i) => (
+              <input
+                type="radio"
+                name="rating-9"
+                className="mask mask-star-2 bg-primary"
+                style={{
+                  transform: "none",
+                  animation: "none",
+                }}
+                checked={recipe.rating === i + 1}
+                readOnly
+                key={`${i}_rating`}
+              />
+            ))}
+          </div>
 
-      {recipe.notes && (
-        <div className="pt-8">
-          <i>~ {recipe.notes}</i>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full mt-8">
-        <div>
-          <h2>Ingredients</h2>
-          {recipe.ingredients.map((ingr) => (
-            <div key={ingr}>
-              <span className="font-bold">
-                {ingr.substring(0, ingr.indexOf(" "))}
-              </span>{" "}
-              <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+          {recipe.notes && (
+            <div className="pt-8">
+              <i>~ {recipe.notes}</i>
             </div>
-          ))}
-        </div>
-        <div className="col-span-2">
-          <h2>Steps</h2>
-          {recipe.steps.map((s, i) => (
-            <div key={s}>
-              <span className="font-bold">{i + 1}.</span>
-              {" " + s}
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full mt-8">
+            <div>
+              <h2>Ingredients</h2>
+              {recipe.ingredients.map((ingr) => (
+                <div key={ingr}>
+                  <span className="font-bold">
+                    {ingr.substring(0, ingr.indexOf(" "))}
+                  </span>{" "}
+                  <span>{ingr.substring(ingr.indexOf(" ") + 1)}</span>
+                </div>
+              ))}
             </div>
-          ))}
+            <div className="col-span-2">
+              <h2>Steps</h2>
+              {recipe.steps.map((s, i) => (
+                <div key={s}>
+                  <span className="font-bold">{i + 1}.</span>
+                  {" " + s}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="pt-4">
-        <h2>Similar Recipes</h2>
+      <div className="pt-16">
+        <div className="prose">
+          <h2 className="pb-6">Similar Recipes</h2>
+        </div>
 
         {recipePages ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            <div className="overflow-x-scroll gap-4 grid grid-flow-col auto-cols-[calc(93%-16px*2)] md:auto-cols-[calc(50%-16px*2)] lg:auto-cols-[calc(30%-16px*2)]">
               {recipePages.pages.map((recipes) =>
                 recipes.map((recipe) => {
                   return (
-                    <RecipeCard
-                      recipe={recipe}
-                      key={recipe.id}
-                      session={session}
-                    />
+                    <div key={recipe.id} className="pb-2">
+                      <RecipeCard recipe={recipe} session={session} />
+                    </div>
                   );
                 })
               )}
-            </div>
-            <div className="mb-8 px-8 py-4 my-16">
               {isFetchingNextPage ? (
-                <LoadingSpinner height="mb-8 h-full" />
+                <LoadingSpinner height="h-12" />
               ) : hasNextPage ? (
                 <button
                   onClick={() => fetchNextPage()}
                   disabled={!hasNextPage || isFetchingNextPage}
-                  className="mb-8 px-8 py-4 bg-base-200 rounded-xl"
+                  className="px-8 py-4 bg-base-200 rounded-xl"
                 >
                   Load More
                 </button>
+              ) : recipePages.pages.at(0)?.length === 0 ? (
+                <div>There are no similar recipes :(</div>
               ) : (
                 ""
               )}

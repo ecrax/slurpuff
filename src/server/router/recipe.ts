@@ -119,20 +119,24 @@ export const recipeRouter = createRouter()
   .query("getAllWithTags", {
     input: z.object({
       tags: z.array(z.string()),
+      currentRecipeId: z.string(),
       cursor: z.string().nullish(),
     }),
     resolve: async ({ input, ctx }) => {
       let recipes;
       if (!input.cursor) {
         recipes = await ctx.prisma.recipe.findMany({
-          take: 9,
+          take: 6,
           where: {
             tags: {
               some: {
                 name: {
-                  in: input.tags
-                }
-              }
+                  in: input.tags,
+                },
+              },
+            },
+            NOT: {
+              id: input.currentRecipeId,
             },
           },
           select: {
@@ -147,7 +151,7 @@ export const recipeRouter = createRouter()
         });
       } else {
         recipes = await ctx.prisma.recipe.findMany({
-          take: 9,
+          take: 6,
           skip: 1,
           cursor: {
             id: input.cursor,
@@ -156,9 +160,12 @@ export const recipeRouter = createRouter()
             tags: {
               some: {
                 name: {
-                  in: input.tags
-                }
-              }
+                  in: input.tags,
+                },
+              },
+            },
+            NOT: {
+              id: input.currentRecipeId,
             },
           },
           select: {
