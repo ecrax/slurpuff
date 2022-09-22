@@ -10,7 +10,10 @@ import styles from "../../../styles/New.module.css";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
 import { msToTime, toMiliseconds } from "../../../utils/time";
-import DynamicInput from "../../../components/DynamicInput";
+import {
+  DynamicInput,
+  DynamicInputWithAutocomplete,
+} from "../../../components/DynamicInput";
 import Image from "next/image";
 import { uploadImage } from "../../../utils/uploadImage";
 import LoadingSpinner from "../../../components/LoadingSpinner";
@@ -351,7 +354,7 @@ const EditContent: React.FC<{
                     <p className="text-red-500">Fill or delete empty fields</p>
                   )}
 
-                <DynamicInput
+                <DynamicInputWithAutocomplete
                   register={register}
                   control={control}
                   name={"tags"}
