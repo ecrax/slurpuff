@@ -20,6 +20,9 @@ export const recipeRouter = createRouter()
             tags: true,
             timeRequired: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
       } else {
         recipes = await ctx.prisma.recipe.findMany({
@@ -36,6 +39,9 @@ export const recipeRouter = createRouter()
             steps: true,
             tags: true,
             timeRequired: true,
+          },
+          orderBy: {
+            createdAt: "desc",
           },
         });
       }
@@ -86,6 +92,9 @@ export const recipeRouter = createRouter()
             tags: true,
             timeRequired: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
       } else {
         recipes = await ctx.prisma.recipe.findMany({
@@ -109,6 +118,9 @@ export const recipeRouter = createRouter()
             steps: true,
             tags: true,
             timeRequired: true,
+          },
+          orderBy: {
+            createdAt: "desc",
           },
         });
       }
@@ -148,6 +160,11 @@ export const recipeRouter = createRouter()
             tags: true,
             timeRequired: true,
           },
+          orderBy: {
+            tags: {
+              _count: "desc",
+            },
+          },
         });
       } else {
         recipes = await ctx.prisma.recipe.findMany({
@@ -176,6 +193,11 @@ export const recipeRouter = createRouter()
             steps: true,
             tags: true,
             timeRequired: true,
+          },
+          orderBy: {
+            tags: {
+              _count: "desc",
+            },
           },
         });
       }
